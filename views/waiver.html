@@ -1,0 +1,220 @@
+{% extends 'index.html' %} 
+
+{% block css %}
+
+	<style>
+		section#shiurs .list-group-item {
+			text-align: left;
+		}
+        
+        section#eternities .modal-body p {
+            text-align: left;
+            padding: 18px;
+        }
+
+        .form-login .input-group-addon {
+            display:none;
+        }
+
+        @media(min-width:467px) {
+            .form-login .input-group-addon {
+                display:inline;
+            }
+        }
+
+        /* iframe */
+        @media(min-width:218px) {
+            
+        }
+
+        @media(min-width:388px) {
+            
+        }
+
+	</style>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        var BaseHome = this.BaseHome = {
+            logout: function() {
+                $.post( "api/accounts/logout/",
+                        { },
+                        function(response) {
+                            alert(response);
+                            window.location.reload(true);
+                        }
+                );
+            }
+        };
+
+    </script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+    <section id="eternities" class="container content-section text-center">
+        
+        <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Terms of Service</h4>
+                </div>
+                <div class="row modal-body">
+                    
+                    <p>
+                    
+                    Freeternity is a completely free, open source, volunteer-driven project (collectively, “our,” “us,” or “we”).  It is an online platform for ideas that are governed, as applicable, by our Terms of Service (our “TOS”). By using this website, visually consuming any of its content or design, or accessing any bit of content on any pages on our website, you (“user”) accept and agree to the following Terms of Service as a legal contract between you and www.freeternity.com.
+                    
+                    {# later do continue buttons 
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <i class='glyphicon glyphicon-eye-close'></i> Friends only
+                    <span class="caret"></span>
+                    </button>
+                    #}
+                    
+                    <br/><br/>    
+                    
+                    We are not doctors and we do not provide medical advice.  The content on our sites and services are presented in a summary fashion, and is intended to be used for educational, informative, and entertainment purposes only. No assurance can be given that the information contained on our sites and services will always include the most recent findings or developments. Any information on our sites and services are not intended to be, should not be interpreted as, or used as a substitute for, medical advice or a diagnosis of any health or fitness problem, condition or disease; or a recommendation for a specific test, doctor, care provider, procedure, treatment plan, product, or course of action.  
+                    
+                    <br/><br/>    
+                    
+                    We are not a referral service and do not recommend or endorse any particular healthcare provider. Rather, we are only an intermediary that provides selected information about healthcare providers. We do not offer advice regarding the quality or suitability of any particular healthcare provider for specific treatments or health conditions, and no information on our sites should be construed as health or medical advice. Any ratings of a healthcare provider’s service are statements of opinion and not statements of fact or recommendations to utilize the services of any specific healthcare provider. You should obtain any additional information necessary to make an informed decision prior to utilizing any specific healthcare provider.
+                    
+                    <br/><br/>
+                        
+                    You assume all responsibility in connection with choosing any healthcare provider, whether or not you obtained information about such healthcare provider on or through our site. IN NO EVENT WILL WE BE LIABLE FOR DAMAGES OF ANY KIND (INCLUDING, WITHOUT LIMITATION, ANY SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES) ARISING OUT OF OR IN CONNECTION WITH ANY ADVICE, TREATMENT OR OTHER INFORMATION OR SERVICES PROVIDED TO YOU BY ANY HEALTHCARE PROVIDER WITH WHOM YOU MAY MAKE CONTACT THROUGH OUR SITES AND SERVICES OR FOR ANY MALPRACTICE CLAIMS OR OTHER CLAIMS THAT MAY ARISE DIRECTLY OR INDIRECTLY FROM ANY SUCH ADVICE, TREATMENT OR OTHER INFORMATION OR SERVICES. TO THE EXTENT THE FOREGOING LIMITATION OF LIABILITY IS PROHIBITED, OUR SOLE OBLIGATION TO YOU FOR DAMAGES WILL BE LIMITED TO $100.00.
+                    
+                    <br/><br/>
+                        
+                    We are not a medical or healthcare provider and your use of our sites and services do not create a doctor-patient relationship. You agree to be solely responsible for your use of our sites and services and for determining the suitability of, and the results obtained from, any professional you consult. Never disregard the medical advice of your physician or health-care professional, or delay in seeking such advice, because of something you read on our sites. If you think you may have a medical emergency, call your physician or 911 immediately.
+                    
+                    <br/><br/>
+                        
+                    Last updated: July 11th, 2018
+
+                    </p>
+
+                </div>
+                <div class="modal-footer">
+
+                    {% if request.user.is_authenticated %}
+                    <div class="dropdown" style='display:inline;'>
+
+                      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class='glyphicon glyphicon-eye-close'></i> Friends only
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="#"><i class='glyphicon glyphicon-eye-close'></i> Friends only</a></li>
+                        <li><a href="#"><i class='glyphicon glyphicon-eye-open'></i> Web</a></li>
+                      </ul>
+                    </div>
+
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Logout</button>
+                    {% else %}
+                        <button type="button" data-toggle="#modal-waiver-liability" data-target="#modal-waiver-liability" href="#modal-waiver-liability" class="btn btn-info modal-activate" data-dismiss="modal">I have read and agree to the above waiver</button>
+                    {% endif %}
+                </div>
+            </div>
+            <br/><br/>
+        
+        {% for eternity in eternities %}
+            <div class="modal-content">
+                <div class="modal-header">
+
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{eternity.title}}</h4>
+                </div>
+                <div class="row modal-body">
+                    
+                    {% if eternity.uplifting %}
+                    <p>
+                        {{eternity.uplifting}}
+                    </p>
+                    {% endif %}
+
+                    <div class="list-group">
+                        {% for sefer in sfarim %}
+                            <a href="" class="list-group-item" style="border-radius: 0 !important; border-width: 1px 0px !important;">
+
+                                {% if request.user.is_authenticated %}
+                                <span class="badge"><i title="Edit title" class='glyphicon glyphicon-pencil'></i></span>
+                                <span class="badge"><i title="Hide" class='glyphicon glyphicon-lock'></i></span>
+                                <span class="badge"><i title="Publish publicly" class='glyphicon glyphicon-bullhorn'></i> </span>
+                                <span class="badge"><i title="Deletes" class='glyphicon glyphicon-remove-sign'></i></span>
+                                {% endif %}
+                            {{sefer.title|safe}}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    {% if request.user.is_authenticated %}
+                    <div class="dropdown" style='display:inline;'>
+
+                      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class='glyphicon glyphicon-eye-close'></i> Friends only</a>
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="#"><i class='glyphicon glyphicon-eye-close'></i> Friends only</a></li>
+                        <li><a href="#"><i class='glyphicon glyphicon-eye-open'></i> Web</a></li>
+                      </ul>
+                    </div>
+
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Logout</button>
+                    {% else %}
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Spread love &#x2764;</button>
+                    {% endif %}
+                </div>
+            </div>
+            <br/><br/>
+        {% endfor %}
+    </section>
+    
+    {% if settings.ALLOW_LOGIN %}
+    {% if not settings.HTML_ONLY %}
+    <!-- Login or rogister Section -->
+    <section id="login" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Login or Register</h2>
+                <p>
+                    <button class="modal-activate" data-toggle='#modal-login-register' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user" data-toggle="#modal-waiver-liability" data-target="#modal-waiver-liability" href="#modal-waiver-liability"></i> Login/register</button>
+                    
+                </p>
+
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endif %}
+    
+    {#
+    <!--  Section -->
+    <section class="masthead content-section text-center">
+        <div class="">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h2>Contact the volunteers at Freeternity</h2>
+                    We would love to get to know each and every one of you.  Eternal life truly is a gift from on High and 
+                    is given to those who do the greatest goodnesses to human existance.  It all starts with a little bit of love, that moment when you feel such a tremendous connection to the greatest being that isn't a being at all.  You feel it, on a boat, a windsurfing sail, or on the slopes, you say "ahhhh, I love you so much" and at that moment you are alive.  
+                </div>
+            </div>
+        </div>
+    </section>
+    #}
+
+{% endblock %}
+
+{% block modal %}
+
+    {% include "modals/modal_login.html" %}
+    {% include "modals/modal_waiver_liability.html" %}
+
+{% endblock %}

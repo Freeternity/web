@@ -1,0 +1,120 @@
+{% extends 'modals/modal.html' %}
+
+{% block modalid %}login-register{% endblock %}
+
+{% block modalcontent %}
+<form onsubmit='return false;' method='POST' action='#'>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Login or Register</h4>
+    </div>
+    <div class="row modal-body">
+        <div class="col-xs-6 col-md-4">
+           <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+        </div>
+
+        <div class="col-xs-6 col-md-4">
+            <input type="password" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" formaction='ajax/login.html' data-dismiss="modal">Cancel</button>
+        <button onclick="ModalLogin.login(); return false;" type="submit" class="btn btn-info">Login or Register</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block modaljs %}
+    <script>
+        var ModalLogin = this.ModalLogin = {
+                login_yes: false,
+
+                login: function() {
+                    var username = $('input[placeholder="Username"]').val();
+                    var password = $('input[placeholder="Password"]').val();
+                    var login_async = function () {
+
+                        $.ajax( "/api/accounts/login/", {
+                                type: "POST",
+                                data: { login: username, password: password },
+                                statusCode: {
+                                    200: function (response) {
+                                        if (typeof response == "object") {
+                                            //alert(JSON.stringify(response));
+                                            //alert('redir');
+                                            ModalLogin.login_yes = true;
+                                            var uri = window.location.href.split("#")[0];
+                                            window.location.href=uri;
+                                        }
+                                    },
+                                    400: function (response) {
+                                     $('.alert').remove();
+                                     if (typeof responseJSON == "object") {
+                                     var responseJSON = response.responseJSON;
+                                     alert(JSON.stringify(responseJSON));
+
+                                        for (var key in responseJSON) {
+                                            $('<div class="alert alert-warning" role="alert"><b>'+key+'</b> '+responseJSON[key][0]+'</div>').prependTo('#modal-login-register .modal-body').fadeIn('slow');
+                                        }
+                                     }
+
+                                     //alert(ModalLogin.login_yes);
+
+                                     if (!ModalLogin.login_yes)
+                                         register_async();
+
+                                  },
+                                }
+                        });
+
+                    };
+
+                    login_async();
+
+                    var register_async = function () {
+                        var registered = false;
+                        $.ajax("/api/accounts/register/", {
+                           type: "POST",
+                           data: { username: username, password: password, password_confirm: password },
+                           statusCode: {
+                              200: function (response) {
+
+                              },
+                              400: function (response) {
+
+                                 $('.alert').remove();
+
+                                 var responseJSON = response.responseJSON;
+                                 if (typeof responseJSON == "object") {
+                                    for (var key in responseJSON) {
+                                        if (key != 'password_confirm') {
+                                            $('<div class="alert alert-warning" role="alert"><b>'+key+'</b> '+responseJSON[key][0]+'</div>').prependTo('#modal-login-register .modal-body').fadeIn('slow');
+                                        }
+                                    }
+                                 }
+
+                              },
+
+                           }, success: function () {
+
+                              login_async();
+
+                           },
+                        });
+
+                        if (registered) {
+                             setTimeout(function(){ }, 3000);
+                        }
+
+                    };
+
+                    return false;
+
+
+                }
+
+             };
+
+    </script>
+{% endblock %}

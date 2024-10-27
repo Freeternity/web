@@ -1,0 +1,25 @@
+{
+  "name": "freeternity",
+  "version": "1.0.0",
+  "description": "*** Add crontab ***",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "express-nunjucks": "^2.2.3",
+    "nano": "^6.4.3",
+    "nunjucks": "^3.1.2",
+    "react": "^16.4.1",
+    "strapi": "^3.6.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://freeternity@bitbucket.org/freeternity/web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/freeternity/web#readme"
+}

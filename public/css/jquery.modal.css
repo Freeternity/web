@@ -1,0 +1,450 @@
+
+input::-ms-clear {
+
+    display: none;
+
+}
+
+.mobile .button.cancel:not(.disabled)>.inner>button:not(:disabled):active {
+
+    background: #b2b2bd;
+
+}
+
+.button {
+
+    position: absolute;
+
+    height: 37px;
+
+}
+
+.button>.inner>button::-moz-focus-inner {
+
+    border: 0;
+
+    padding: 0;
+
+}
+
+.button:not(.disabled)>.inner>button:not(:disabled):active {
+
+    background-image: -webkit-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -moz-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -ms-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -o-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -webkit-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -moz-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -ms-linear-gradient(#328ac3, #277bbe);
+
+    background-image: -o-linear-gradient(#328ac3, #277bbe);
+
+    background-image: linear-gradient(#328ac3, #277bbe);
+
+}
+
+.desktop .codeInput>.container>input.digit.digit1:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit1:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit4:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit4:not(.focus):not(:focus) {
+
+    -webkit-border-radius: 4px 0 0 4px;
+
+    -moz-border-radius: 4px 0 0 4px;
+
+    -ms-border-radius: 4px 0 0 4px;
+
+    -o-border-radius: 4px 0 0 4px;
+
+    border-radius: 4px 0 0 4px;
+
+    z-index: 1;
+
+}
+
+.desktop .codeInput>.container>input.digit.digit2:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit2:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit5:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit5:not(.focus):not(:focus) {
+
+    z-index: 2;
+
+}
+
+.desktop .codeInput>.container>input.digit.digit3:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit3:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit6:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit6:not(.focus):not(:focus) {
+
+    -webkit-border-radius: 0 4px 4px 0;
+
+    -moz-border-radius: 0 4px 4px 0;
+
+    -ms-border-radius: 0 4px 4px 0;
+
+    -o-border-radius: 0 4px 4px 0;
+
+    border-radius: 0 4px 4px 0;
+
+    z-index: 3;
+
+}
+
+.desktop .codeInput>.container>input.digit.digit1:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit1:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit2:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit2:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit4:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit4:not(.focus):not(:focus),
+
+.desktop .codeInput>.container>input.digit.digit5:not(.focus):not(:focus),
+
+.tablet .codeInput>.container>input.digit.digit5:not(.focus):not(:focus) {
+
+    border-right-color: #e4e4e4;
+
+}
+
+.tablet .codeInput>.container>input:not(.controlInput):nth-child(1):not(.focus):not(:focus) {
+
+    border-radius: 5px 0 0 5px;
+
+}
+
+.tablet .codeInput>.container>input:not(.controlInput):nth-child(3):not(.focus):not(:focus) {
+
+    border-radius: 0 5px 5px 0;
+
+}
+
+.close {
+
+    position: absolute;
+
+    top: 10px;
+
+    right: 10px;
+
+    width: 22px;
+
+    height: 23px;
+
+    background: url("../img/close.png") no-repeat;
+
+    background-size: 100% 100%;
+
+    cursor: pointer;
+
+    z-index: 100000;
+
+}
+
+header>.content>.back {
+
+    position: absolute;
+
+    top: 11px;
+
+    left: 12px;
+
+    width: 14px;
+
+    height: 14px;
+
+    background: url("../img/backArrow.png") no-repeat;
+
+    background-size: 100% 100%;
+
+    cursor: pointer;
+
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+
+only screen and (min--moz-device-pixel-ratio: 1.5),
+
+only screen and (min-device-pixel-ratio: 1.5) {
+
+    header>.content>.back {
+
+        background-image: url("../img/backArrow.png");
+
+    }
+
+}
+
+header>.content>.back,
+
+header>.content>.close {
+
+    -webkit-filter: contrast(1);
+
+    -webkit-transition: -webkit-filter .15s linear;
+
+    -moz-transition: -webkit-filter .15s linear;
+
+    -ms-transition: -webkit-filter .15s linear;
+
+    -o-transition: -webkit-filter .15s linear;
+
+    transition: -webkit-filter .15s linear;
+
+    -webkit-transform: translateZ(0);
+
+    z-index: 25;
+
+}
+
+header>.content>.back:active,
+
+header>.content>.close:active {
+
+    -webkit-filter: contrast(1.2);
+
+}
+
+header>.content>.image {
+
+    width: 76px;
+
+    height: 75px;
+
+    position: absolute;
+
+    margin-left: -8px;
+
+    top: -40px;
+
+}
+
+header>.content>.image:after {
+
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    right: 0;
+
+    bottom: 0;
+
+    background: url("../img/icon-border.png") no-repeat;
+
+    background-size: 100% 100%;
+
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+
+only screen and (min--moz-device-pixel-ratio: 1.5),
+
+only screen and (min-device-pixel-ratio: 1.5) {
+
+    header>.content>.image:after {
+
+        background-image: url("../img/icon-border.png");
+
+    }
+
+}
+
+header>.content>.image>img {
+
+    background: #fff;
+
+    width: 64px;
+
+    height: 64px;
+
+    display: block;
+
+    -webkit-border-radius: 32px;
+
+    -moz-border-radius: 32px;
+
+    -ms-border-radius: 32px;
+
+    -o-border-radius: 32px;
+
+    border-radius: 32px;
+
+    margin: 4px 6px 0;
+
+}
+
+header>.content>.title {
+
+    padding: 15px;
+
+    margin: 0;
+
+    position: relative;
+
+    z-index: 1;
+
+}
+
+header>.content>.title>h1,
+
+header>.content>.title>h2 {
+
+    text-shadow: 0 1px 0 #fff;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    line-height: 1.1em;
+
+    margin: 0;
+
+    padding: 0;
+
+    text-align: center;
+
+}
+
+header>.content>.title>h1 {
+
+    color: #000;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    height: 22px;
+
+    padding-top: 53px;
+
+}
+
+header>.content>.title>h2 {
+
+    color: #5b5b65;
+
+    font-size: 13px;
+
+    font-family: "HelveticaNeueMedium", "HelveticaNeue-Medium", "Helvetica Neue Medium", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial;
+
+    font-weight: normal;
+
+    padding-bottom: 5px;
+
+}
+
+.mobile .input input:-ms-input-placeholder {
+
+    color: #c7c7cd;
+
+    font-size: 15px;
+
+    font-family: "HelveticaNeueMedium", "HelveticaNeue-Medium", "Helvetica Neue Medium", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial;
+
+}
+
+.mobile .input input:-moz-placeholder {
+
+    color: #c7c7cd;
+
+    font-size: 15px;
+
+    font-family: "HelveticaNeueMedium", "HelveticaNeue-Medium", "Helvetica Neue Medium", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial;
+
+}
+
+.desktop .input input:-ms-input-placeholder,
+
+.tablet .input input:-ms-input-placeholder {
+
+    color: #a1a1a7;
+
+    font-size: 15px;
+
+    font-family: "HelveticaNeueMedium", "HelveticaNeue-Medium", "Helvetica Neue Medium", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial;
+
+}
+
+.desktop .input input:-moz-placeholder,
+
+.tablet .input input:-moz-placeholder {
+
+    color: #a1a1a7;
+
+    font-size: 15px;
+
+    font-family: "HelveticaNeueMedium", "HelveticaNeue-Medium", "Helvetica Neue Medium", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial;
+
+}
+
+.tablet .input input:-moz-placeholder {
+
+    color: #82828c;
+
+    font-size: 18px;
+
+}
+
+@-moz-document url-prefix() {
+
+    .desktop .input.selectInput>.control>select {
+
+        padding: 7px 6px 2px 24px;
+
+    }
+
+}
+
+.ie10 .input.selectInput>.control>select::-ms-expand,
+
+.ie11 .input.selectInput>.control>select::-ms-expand {
+
+    display: none;
+
+}
+
+.layoutView {
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    box-sizing: border-box;
+
+}
+
+.layoutView>.layoutSubview {
+
+    position: absolute;
+
+    left: 0;
+
+    right: 0;
+
+}

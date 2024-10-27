@@ -1,0 +1,133 @@
+{% extends 'index.html' %} 
+
+{% block css %}
+    <style>
+        section#shiurs .list-group-item {
+            text-align: left;
+        }
+
+        section#news .modal-body p {
+            text-align: left;
+            padding: 18px;
+        }
+
+        .form-login .input-group-addon {
+            display:none;
+        }
+
+        @media(min-width:467px) {
+            .form-login .input-group-addon {
+                display:inline;
+            }
+        }
+
+        /* iframe */
+        @media(min-width:218px) {
+
+        }
+
+        @media(min-width:388px) {
+
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+    <script>
+        var BaseHome = this.BaseHome = {
+            logout: function() {
+                $.post( "api/accounts/logout/",
+                        { },
+                        function(response) {
+                            alert(response);
+                            window.location.reload(true);
+                        }
+                );
+            }
+        };
+    </script>
+{% endblock %}
+
+{% block header_msg %}
+    <h1 class="mb-5">Longevity more accessible</h1>
+    <p>
+        The greatest eternity is the eternity of love. Doing kindnesses and spreading goodnesses throughout this wonder-filled world we call Earth. And helping those who are weak or ill. Love only.
+    </p>
+    <button type="button" class="btn btn-default" data-dismiss="modal" style="background: #fff;">Spread Eternity ❤</button>
+{% endblock %}
+
+{% block content %}
+    {% if hi_video %}
+        <!-- Intro Header -->
+        <header class="intro">
+            <div class="intro-body">
+                <div class="container" style='padding-left:0;'>
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-2">
+                            {% if hi_video %}
+                                <span id='daily_shiur_span' class="btn btn-primary btn-lg" style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' href="" role="button">{{daily_shiur.title}}</span><Br/><br/>
+                                <h1 class="brand-heading brand-daily-shiur" style='display:none;padding-left:15px;'>{{hi_video.title}}</h1>
+                                {% if hi_video.video_url %}
+                                    <iframe id="player_1" style="margin-left: 20px;" src="{{daily_shiur.video_url}}" frameborder="0" width="90%" height="300"></iframe>
+                                {% endif %}
+                                <div>
+                                    <button class='btn'><i class='glyphicon glyphicon-chevron-left'></i></button>
+                                    <button class='btn'><i class='glyphicon glyphicon-chevron-right'></i></button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+    {% endif %}
+
+    <section id="news" class="container content-section text-center">
+        <br/><br/>
+        
+        {% for news_item in news %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">{{ news_item.username_posting }} - {{ news_item.date_posted }}</h4>
+                </div>
+                <div class="row modal-body">
+                    <p>{{ news_item.msg }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <br/><br/>
+        {% endfor %}
+    </section> 
+
+    {% if settings.ALLOW_LOGIN %}
+    <!-- Login or register Section -->
+    <section id="login" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Login or Register</h2>
+                <p>
+                    <button data-toggle='#modal-login-register' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Login/register</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Contact Section -->
+    <section id="contact" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Contact</h2>
+                <p><a href="mailto:{{settings.EMAIL}}">{{settings.EMAIL}}</a></p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block modal %}
+    {% include "modals/modal_login.html" %}
+    {% include "modals/modal_record.html" %}
+{% endblock %}

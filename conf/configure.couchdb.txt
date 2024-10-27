@@ -1,0 +1,8 @@
+to get couchdb running smoothly, you shall need to set a password and a cookie string as follows:
+$ sudo snap set couchdb admin=[your-password-goes-here] setcookie=[your-cookie-goes-here]
+$ sudo snap start couchdb 
+
+put couchdb sudo snap start couchdb in crontab -e from root
+
+from the codebase in index.js, couchdb can run as the var nano = require('nano')('http://admin:freeternity45@localhost:5984');
+

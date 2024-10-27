@@ -1,0 +1,80 @@
+{% extends 'modals/modal.html' %}
+
+{% block modalid %}waiver-liability{% endblock %}
+
+{% block modalcontent %}
+<form onsubmit='return false;' method='POST' action='#'>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Enter your signature</h4>
+    </div>
+    <div class="row modal-body">
+        <div class="col-md-10">
+            <p>
+                By entering your signature, you indicate that you have read and agree to the listed Terms of Service.
+            </p>
+            <input class="form-control" id='waiver_signature' placeholder='X: Signature of acceptance' type='text' style="font-family: 'Dancing Script', cursive;" />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" formaction='ajax/login.html' data-dismiss="modal">Cancel</button>
+        <button onclick="ModalWaiverLiability.waiver_send(); return false;" type="submit" class="btn btn-info">I agree</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block modaljs %}
+    
+<link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet">
+
+    <script>
+        var ModalWaiverLiability = this.ModalWaiverLiability = {
+                waiver_yes: false,
+                waived: false,
+                waiver_send: function() {
+                        
+                        var signature = $('input#waiver_signature').val();
+                        var date = new Date();
+                        var date_string = date.toString();
+                    
+                            $.ajax( "/api/waiver/", {
+                                    type: "POST",
+                                    data: { agree: 1, signature: signature, date: date_string },
+                                    statusCode: {
+                                        200: function (response) {
+                                            if (typeof response == "object") {
+                                                //alert(JSON.stringify(response));
+                                                //alert('redir');
+                                                ModalLogin.waiver_yes = true;
+                                                //var uri = window.location.href.split("#")[0];
+                                                window.location.href='/news';
+                                            }
+                                        },
+                                        400: function (response) {
+                                             $('.alert').remove();
+                                             if (typeof responseJSON == "object") {
+                                             var responseJSON = response.responseJSON;
+                                             alert(JSON.stringify(responseJSON));
+
+                                                for (var key in responseJSON) {
+                                                    $('<div class="alert alert-warning" role="alert"><b>'+key+'</b> '+responseJSON[key][0]+'</div>').prependTo('#modal-waiver-liability .modal-body').fadeIn('slow');
+                                                }
+                                             }
+
+                                             //alert(ModalLogin.login_yes);
+
+                                             if (!ModalWaiverLiability.waiver_yes)
+                                                 alert("continue");
+
+                                        }
+                                    }
+                            });
+
+                            return false;
+
+                    }
+
+                }
+
+    </script>
+{% endblock %}

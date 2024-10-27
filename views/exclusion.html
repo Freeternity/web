@@ -1,0 +1,123 @@
+{% extends 'index.html' %} 
+
+{% block css %}
+
+	<style>
+		section#shiurs .list-group-item {
+			text-align: left;
+		}
+        
+        section#eternities .modal-body p {
+            text-align: left;
+            padding: 18px;
+        }
+
+        .form-login .input-group-addon {
+            display:none;
+        }
+
+        @media(min-width:467px) {
+            .form-login .input-group-addon {
+                display:inline;
+            }
+        }
+
+        /* iframe */
+        @media(min-width:218px) {
+            
+        }
+
+        @media(min-width:388px) {
+            
+        }
+
+	</style>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        var BaseHome = this.BaseHome = {
+            logout: function() {
+                $.post( "api/accounts/logout/",
+                        { },
+                        function(response) {
+                            alert(response);
+                            window.location.reload(true);
+                        }
+                );
+            }
+        };
+
+    </script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+
+    <section id="eternities" class="container content-section text-center">
+        
+        <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Welcome to Freeternity</h4>
+                </div>
+                <div class="row modal-body">
+                    
+                    <p>
+                        
+                    </p>
+
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+            <br/><br/>
+        
+    </section>
+    
+    {% if settings.ALLOW_LOGIN %}
+    {% if not settings.HTML_ONLY %}
+    <!-- Login or rogister Section -->
+    <section id="login" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Login or Register</h2>
+                <p>
+                    <button class="modal-activate" data-toggle='#modal-login-register' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user" data-toggle="#modal-waiver-liability" data-target="#modal-waiver-liability" href="#modal-waiver-liability"></i> Login/register</button>
+                    
+                </p>
+
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endif %}
+    
+    {#
+    <!--  Section -->
+    <section class="masthead content-section text-center">
+        <div class="">
+            <div class="container">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h2>Contact the volunteers at Freeternity</h2>
+                    We would love to get to know each and every one of you.  Eternal life truly is a gift from on High and 
+                    is given to those who do the greatest goodnesses to human existance.  It all starts with a little bit of love, that moment when you feel such a tremendous connection to the greatest being that isn't a being at all.  You feel it, on a boat, a windsurfing sail, or on the slopes, you say "ahhhh, I love you so much" and at that moment you are alive.  
+                </div>
+            </div>
+        </div>
+    </section>
+    #}
+
+{% endblock %}
+
+{% block modal %}
+
+    {% include "modals/modal_login.html" %}
+    {% include "modals/modal_waiver_liability.html" %}
+
+{% endblock %}

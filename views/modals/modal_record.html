@@ -1,0 +1,104 @@
+{% extends 'modals/modal.html' %}
+{% block modalid %}upload{% endblock %}
+
+{% block modalcontent %}
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Record</h4>
+    </div>
+    <div class="modal-body">
+        <div style='display:none;' class="input-group input-group-lg">
+            <span class="input-group-addon" id="sizing-addon1">Title</span>
+            <input type="text" class="form-control" placeholder="Title" aria-describedby="sizing-addon1">
+        </div>
+
+        <div class='row'>
+            <div class="col-xs-8 col-md-8">
+                <audio id='modal-upload-audio' style='line-height:none; display:none;' controls autoplay></audio>
+                <button style='width:100%;' class='btn btn-info w-100' id="btn-start-recording">Start Recording</button>
+            </div>
+            <div class="col-xs-4 col-md-4">
+                <button style='width:100%; display:none;' class='btn btn-info w-100' disabled id="btn-stop-recording" disabled>Stop</button>
+            </div>
+
+        </div>
+
+        <div class="progress" style='margin-top: 10px; display:none;'>
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+            <span class="sr-only">Recording</span>
+          </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button style='display:none;' class='btn btn-info w-100' id="btn-reload-recording" disabled><i class="glyphicon glyphicon-repeat"></i> Start over</button>
+        <button type="button" class="btn btn-info" data-dismiss="modal">Upload and share' %}</button>
+    </div>
+
+{% endblock %}
+
+{% block modaljs %}
+
+    <script>
+    var audio = document.querySelector('audio');
+    function captureMicrophone(callback) {
+        $('#btn-stop-recording').show();
+        audio.muted = "true";
+        navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+        navigator.getUserMedia({audio: true}, callback, function(error) {
+            alert('Unable to access your microphone.');
+            console.error(error);
+        });
+    }
+    function stopRecordingCallback() {
+        var blob = recorder.getBlob();
+        audio.src = URL.createObjectURL(blob);
+        audio.play();
+        recorder.microphone.stop();
+        $('audio').removeAttr("muted");
+        $('audio').attr({"volume": 100});
+    }
+    var recorder; // globally accessible
+    document.getElementById('btn-start-recording').onclick = function() {
+        this.disabled = true;
+        captureMicrophone(function(microphone) {
+            audio.src = URL.createObjectURL(microphone);
+            audio.play();
+            recorder = RecordRTC(microphone, {
+                type: 'audio',
+                recorderType: StereoAudioRecorder,
+                numberOfAudioChannels: 1,
+                echoCancellation: true
+            });
+            recorder.startRecording();
+            // release microphone on stopRecording
+            recorder.microphone = microphone;
+            document.getElementById('btn-stop-recording').disabled = false;
+        });
+    };
+    document.getElementById('btn-stop-recording').onclick = function() {
+        this.disabled = true;
+        $("button#btn-start-recording").hide();
+        $('audio#modal-upload-audio').show();
+        $('button#btn-reload-recording').show().removeAttr('disabled');
+        $('button#btn-stop-recording').hide();
+        recorder.stopRecording(stopRecordingCallback);
+        $('audio').removeAttr("muted");
+    };
+    </script>
+    <script>
+        $(document).ready(function(){
+            // recording
+            $('button#btn-reload-recording').click(function(e) {
+                $("button#btn-start-recording").show().removeAttr('disabled');
+                $('audio#modal-upload-audio').hide();
+                $('button#btn-reload-recording').hide().removeAttr('disabled');
+                $('button#btn-stop-recording').show();
+            });
+
+        });
+    </script>
+{% endblock %}
