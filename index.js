@@ -15,9 +15,11 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 // dev environment
 const isDev = app.get('env') === 'development';
+const admin_username = app.get('admin_username');
+const admin_password = app.get('admin_password');
 
 // couchdb
-var nano = require('nano')('http://admin:freeternity45@localhost:5984');
+var nano = require('nano')('http://'+ admin_username + ':' + admin_password + '@localhost:5984');
 
 // settings var 
 var settings = {};
