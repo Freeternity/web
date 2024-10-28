@@ -12,7 +12,7 @@ app.use(session({
     secret: 'asfjdhag34474hifah347838939349jjks',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: process.env.secure_cookie } // Set to true if using HTTPS
 }));
 
 // https://stackoverflow.com/questions/5710358/how-to-retrieve-post-query-parameters/12008719#12008719
