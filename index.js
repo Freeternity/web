@@ -12,19 +12,28 @@ console.log('secure cookie secure?', process.env.secure_cookie);
 
 if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
-    console.log("secure_cookie is true");
+    console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
     secure_cookie = true;
+    
+    app.use(session({
+        secret: 'asfjdhag34474hifah347838939349jjks',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
+    }));
+
   } else {
     // Code to execute if MY_FLAG is false
-    console.log("secure_cookie is false");
+    console.log("secure_cookie is false ",  typeof(process.env.secure_cookie));
     secure_cookie = false;
+    app.use(session({
+        secret: 'asfjdhag34474hifah347838939349jjks',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
+    }));
   }
-app.use(session({
-    secret: 'asfjdhag34474hifah347838939349jjks',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
-}));
+
 
 // https://stackoverflow.com/questions/5710358/how-to-retrieve-post-query-parameters/12008719#12008719
 var bodyParser = require('body-parser');
