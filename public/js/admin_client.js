@@ -26,9 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function loadNews() {
-        fetch('/admin/news')
-            .then(response => response.json())
-            .then(data => {
+        $.ajax({
+            url: '/api/news',
+            method: 'GET',
+            success: function(data) {
                 newsList.innerHTML = '';
                 data.forEach(newsItem => {
                     const div = document.createElement('div');
@@ -43,7 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     newsList.appendChild(div);
                 });
-            });
+            }
+        });
     }
 
     window.editNews = function(id, msg, username_posting) {
