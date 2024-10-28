@@ -17,7 +17,10 @@ if (process.env.secure_cookie === "true") {
 
     app.use(cookieSession({
         name: 'session',
-        keys: ['key1', 'key2']
+        keys: ['key1', 'key2'],
+        secure: true,
+        secure_cookie: true
+        
     }));
 
     /*console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
