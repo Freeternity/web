@@ -17,10 +17,14 @@ if (process.env.secure_cookie === "true") {
 
     app.use(cookieSession({
         name: 'session',
-        keys: ['key1', 'key2'],
-        secure: true,
-        secure_cookie: true
-        
+        keys: ['asdfhjkas43uii344uh34h43hsjddjjs', 'sdjkjk34784373478shhhjhsjsyu'],
+        cookie: {
+            secure: true, // Ensure cookies are only sent over HTTPS
+            httpOnly: true, // Prevent JavaScript access to cookies
+            sameSite: 'lax', // Restrict cross-site cookie access
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+          }
+
     }));
 
     /*console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
