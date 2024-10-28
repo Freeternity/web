@@ -37,7 +37,7 @@ if (process.env.secure_cookie === "true") {
         resave: true,
         proxy: true,
         saveUninitialized: true,
-        cookie: { secure: 'auto', sameSite: 'lax', httpOnly: false } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {

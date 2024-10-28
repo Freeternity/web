@@ -5,10 +5,10 @@
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Prospective longevity for all with a little exercise and a windsurfing sail on land.">
-    <meta name="author" content="An open source website promoting ideas for longevity for all.">  
+    <meta name="description" content="Prospective longevity for all with a little exercise, supplements, news, registration and more.">
+    <meta name="author" content="An open source website promoting longevity for all, completely free.">  
 
-    <title>Freeternity - an open source listing of longevity services.</title>
+    <title>Freeternity - open source longevity for all.</title>
 
     <!-- Bootstrap Core CSS -->
     <link href= "/static/css/bootstrap.css" rel="stylesheet">
@@ -180,9 +180,8 @@
 
                         {% endif %}
 
-                        {% if request.user.is_authenticated %}
+                        {% if user.is_authenticated %}
                             <li>
-
                                 <a href="#" class="page-scroll"><i class="glyphicon glyphicon-user"></i> {{request.user.username}}</a>
                             </li>
                         {% endif %}
@@ -199,7 +198,7 @@
                                 <a class="page-scroll" href="http://{{settings.DOMAIN}}:5984/_utils/">Admin</a>
                             </li>
                         {% endif %}
-                        {% if request.user.is_authenticated %}
+                        {% if user.is_authenticated %}
                             <li>
                                 <a class="page-scroll" href="#logout" onclick="Base.logout(); return false;">Logout</a>
                             </li>
@@ -228,7 +227,7 @@
                     <div class="header-content mx-auto">
                         {% block header_msg %}
                         <h1 class="mb-5">
-                            Longevity for all, especially the sick.  
+                            Longevity for all, completely free.  
                         </h1>
                         <button type="button" class="btn btn-default" data-dismiss="modal" style="background: #fff;">
                             Spread love ❤
