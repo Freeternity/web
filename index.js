@@ -5,13 +5,22 @@ const expressNunjucks = require('express-nunjucks');
 const app = express();
 
 const session = require('express-session');
+var cookieSession = require('cookie-session');
 
 console.log('secure cookie secure?', process.env.secure_cookie);
 
 
 if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
-    console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
+
+    app.set('trust proxy', 1); // trust first proxy
+
+    app.use(cookieSession({
+        name: 'session',
+        keys: ['key1', 'key2']
+    }));
+
+    /*console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
     secure_cookie = true;
     app.enable('trust proxy', 1);
     app.use(session({
@@ -20,18 +29,24 @@ if (process.env.secure_cookie === "true") {
         proxy: true,
         saveUninitialized: true,
         cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false } // Set to true if using HTTPS secure: process.env.secure_cookie
-    }));
+    }));*/
 
   } else {
     // Code to execute if MY_FLAG is false
     console.log("secure_cookie is false ",  typeof(process.env.secure_cookie));
     secure_cookie = false;
-    app.use(session({
+    
+    app.use(cookieSession({
+        name: 'session',
+        keys: ['key1', 'key2']
+    }));
+    
+    /*app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
-        resave: false,
+        resave: true,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
-    }));
+    }));*/
   }
 
 
