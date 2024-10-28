@@ -8,11 +8,12 @@ const app = express();
 
 const session = require('express-session');
 
+console.log('secure cookie secure?', process.env.secure_cookie);
 app.use(session({
     secret: 'asfjdhag34474hifah347838939349jjks',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.secure_cookie } // Set to true if using HTTPS
+    cookie: {  } // Set to true if using HTTPS secure: process.env.secure_cookie
 }));
 
 // https://stackoverflow.com/questions/5710358/how-to-retrieve-post-query-parameters/12008719#12008719
