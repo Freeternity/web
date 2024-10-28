@@ -1,5 +1,3 @@
-// express and nunjucks templating
-
 require('dotenv').config();
 
 const express = require('express');
@@ -27,7 +25,7 @@ if (process.env.secure_cookie === "true") {
     console.log("secure_cookie is false ",  typeof(process.env.secure_cookie));
     secure_cookie = false;
     app.use(session({
-        secret: 'asfjdhag34474hifah347838939349jjks',
+        secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
         resave: false,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
