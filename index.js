@@ -14,46 +14,55 @@ if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
 
     app.set('trust proxy', 1); // trust first proxy
-
-    app.use(cookieSession({
+    secure_cookie = true;
+    console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
+    
+    /*app.use(cookieSession({
         name: 'session',
         keys: ['asdfhjkas43uii344uh34h43hsjddjjs', 'sdjkjk34784373478shhhjhsjsyu'],
         cookie: {
-            secure: true, // Ensure cookies are only sent over HTTPS
-            httpOnly: true, // Prevent JavaScript access to cookies
+            secure: secure_cookie, // Ensure cookies are only sent over HTTPS
+            httpOnly: false, // Prevent JavaScript access to cookies
             sameSite: 'lax', // Restrict cross-site cookie access
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
           }
 
-    }));
+    }));*/
 
-    /*console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
-    secure_cookie = true;
+    console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
+    
     app.enable('trust proxy', 1);
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: true,
         proxy: true,
         saveUninitialized: true,
-        cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false } // Set to true if using HTTPS secure: process.env.secure_cookie
-    }));*/
+        cookie: { secure: 'auto', sameSite: 'lax', httpOnly: false } // Set to true if using HTTPS secure: process.env.secure_cookie
+    }));
 
   } else {
     // Code to execute if MY_FLAG is false
     console.log("secure_cookie is false ",  typeof(process.env.secure_cookie));
     secure_cookie = false;
     
+    /*
     app.use(cookieSession({
         name: 'session',
-        keys: ['key1', 'key2']
-    }));
+        keys: ['safkafjfak3493474794734kskj', 'asdfjkf4773477ajksdjkf443943'],
+        cookie: {
+            secure: secure_cookie, // Ensure cookies are only sent over HTTPS
+            httpOnly: false, // Prevent JavaScript access to cookies
+            sameSite: 'lax', // Restrict cross-site cookie access
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+          }
+    }));*/
     
-    /*app.use(session({
+    app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
         resave: true,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
-    }));*/
+    }));
   }
 
 
