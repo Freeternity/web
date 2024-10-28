@@ -1,7 +1,6 @@
 {% extends 'index.html' %}
 
 {% block css %}
-
     <style>
         .actions { margin-top: 10px; }
     </style>
@@ -113,26 +112,21 @@
 {% endblock %}
 
 {% block js %}
-
-
     <script>
         var BaseHome = this.BaseHome = {
+
             logout: function() {
-                $.post( "api/accounts/logout/",
-                        { },
-                        function(response) {
-                            alert(response);
-                            window.location.reload(true);
-                        }
-                );
+                $.post("api/accounts/logout/", {}, function(response) {
+                    alert(response.message || 'Logged out successfully');
+                    switchToLoginSection();
+                });
             }
         };
-    </script>
-    <script>
+
         function handleLogin() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
-    
+
             fetch('/api/accounts/login', {
                 method: 'POST',
                 headers: {
@@ -144,12 +138,67 @@
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    window.location.reload();
+                    switchToLogoutSection(username);
                 } else {
                     alert('Login failed: ' + data.message);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+
+        function handleRegistration() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('/api/accounts/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration success!');
+                    switchToLogoutSection(username);
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+        function switchToLogoutSection(username) {
+            const loginSection = document.getElementById('login');
+            const logoutSection = document.getElementById('logout');
+
+            if (loginSection) {
+                loginSection.style.display = 'none';
+            }
+
+            if (logoutSection) {
+                logoutSection.style.display = 'block';
+                document.querySelector('#logout h2').textContent = username;
+            }
+        }
+
+        function switchToLoginSection() {
+            const loginSection = document.getElementById('login');
+            const logoutSection = document.getElementById('logout');
+
+            if (loginSection) {
+                loginSection.style.display = 'block';
+            }
+
+            if (logoutSection) {
+                logoutSection.style.display = 'none';
+            }
         }
     </script>
 {% endblock %}
@@ -163,7 +212,6 @@
 {% endblock %}
 
 {% block content %}
-
     <section id="news" class="container content-section text-center">
         <br/><br/>
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-news-form">Submit News</button>
@@ -187,12 +235,23 @@
 
     {% if settings.ALLOW_LOGIN %}
     <!-- Login or register Section -->
-    <section id="login" class="container content-section text-center">
+    <section id="login" class="container content-section text-center" style="display: {% if user %}none{% else %}block{% endif %};">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">
                 <h2>Login or Register</h2>
                 <p>
                     <button data-toggle='#modal-login-register' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Login/register</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="logout-section" class="container content-section text-center" style="display: {% if user %}block{% else %}none{% endif %};">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>{{ user.username }}</h2>
+                <p>
+                    <button data-toggle='#modal-logout' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Logout</button>
                 </p>
             </div>
         </div>
@@ -214,4 +273,5 @@
     {% include "modals/modal_login.html" %}
     {% include "modals/modal_record.html" %}
     {% include "modals/modal_news.html" %}
+    {% include "modals/modal_logout.html" %}
 {% endblock %}

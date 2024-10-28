@@ -4,6 +4,7 @@ const settings = require('./index.js');
 const databases = [
     settings.COUCHDB_PREFIX + 'waivers',
     settings.COUCHDB_PREFIX + 'eternities',
+    settings.COUCHDB_PREFIX + 'users',
     settings.COUCHDB_PREFIX + 'news' // Add the news database
 ];
 

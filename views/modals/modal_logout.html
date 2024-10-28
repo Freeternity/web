@@ -1,0 +1,32 @@
+{% extends 'modals/modal.html' %}
+
+{% block modaljs %}
+<script>
+    function logout() {
+        $.post('/api/accounts/logout', {}, function(response) {
+            if (response.success) {
+                alert(response.message);
+                window.location.reload(); // Reload the page to update the UI
+            } else {
+                alert('Logout failed: ' + response.message);
+            }
+        });
+    }
+</script>
+{% endblock %}
+
+{% block modalid %}logout{% endblock %}
+
+{% block modalcontent %}
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Logout</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="BaseHome.logout()">Yes, Logout</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+{% endblock %}

@@ -36,15 +36,16 @@
             const msg = $('#msg').val();
             const username_posting = $('#username_posting').val();
             const date_posted = $('#date_posted').val();
+            const pending = true; // Add the pending field
 
             const method = id ? 'PUT' : 'POST';
-            const url = id ? `/admin/news/${id}` : '/admin/news';
+            const url = id ? `/api/news/${id}` : '/api/news'; // Update the URL to use the new route
 
             $.ajax({
                 url: url,
                 method: method,
                 contentType: 'application/json',
-                data: JSON.stringify({ msg, username_posting, date_posted }),
+                data: JSON.stringify({ msg, username_posting, date_posted, pending }), // Include the pending field
                 success: function(data) {
                     alert(data.success || data.error);
                     $('#newsForm')[0].reset();

@@ -36,16 +36,19 @@
         login: function() {
             var username = $('#username').val();
             var password = $('#password').val();
+
             var login_async = function () {
                 $.ajax("/api/accounts/login/", {
                     type: "POST",
-                    data: { login: username, password: password },
+                    data: { username: username, password: password },
                     statusCode: {
                         200: function (response) {
                             if (typeof response == "object") {
                                 ModalLogin.login_yes = true;
-                                var uri = window.location.href.split("#")[0];
-                                window.location.href = uri;
+                                //var uri = window.location.href.split("#")[0];
+                                //window.location.href = uri;
+                                alert('Login success!');
+                                $('#logout-section').show();
                             }
                         },
                         400: function (response) {
@@ -56,21 +59,23 @@
                                     $('<div class="alert alert-warning" role="alert"><b>' + key + '</b> ' + responseJSON[key][0] + '</div>').prependTo('.modal-body').fadeIn('slow');
                                 }
                             }
-                            if (!ModalLogin.login_yes)
+                            if (!ModalLogin.login_yes) {
                                 register_async();
+                            }
                         },
                     }
                 });
             };
-
-            login_async();
 
             var register_async = function () {
                 $.ajax("/api/accounts/register/", {
                     type: "POST",
                     data: { username: username, password: password, password_confirm: password },
                     statusCode: {
-                        200: function (response) {},
+                        200: function (response) {
+                            alert('Registration successful. Logging in...');
+                            login_async();
+                        },
                         400: function (response) {
                             $('.alert').remove();
                             var responseJSON = response.responseJSON;
@@ -82,13 +87,11 @@
                                 }
                             }
                         },
-                    },
-                    success: function () {
-                        login_async();
                     }
                 });
             };
 
+            login_async();
             return false;
         }
     };

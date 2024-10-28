@@ -12,11 +12,8 @@ app.use(session({
     secret: 'asfjdhag34474hifah347838939349jjks',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // Set to true if using HTTPS
+    cookie: { secure: false } // Set to true if using HTTPS
 }));
-
-//react framework
-const react = require('react');
 
 // https://stackoverflow.com/questions/5710358/how-to-retrieve-post-query-parameters/12008719#12008719
 var bodyParser = require('body-parser');
@@ -58,6 +55,10 @@ app.post('/admin/login', adminAuth, (req, res) => {
 const requireLogin = require('./middleware/requireLogin');
 
 const adminRoutes = require('./routes/adminRoutes');
+
+
+const newsRoutes = require('./routes/newsRoutes');
+app.use('/api/news', newsRoutes);
 
 // Other configurations and middleware
 
@@ -141,23 +142,39 @@ if (settings.LOCAL && settings.FAKE_INSERT) {
 
 
 /////////////////////////////////////////////////////////////////////////////////
+// Add this route to handle logout requests
+app.post('/api/accounts/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.json({ success: false, message: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        return res.json({ success: true, message: 'Logged out successfully' });
+    });
+});
 
 app.post('/api/accounts/login', (req, res) => {
     const { username, password } = req.body;
 
     // Check if the user is logging in as an admin
     if (username === admin_username && password === admin_password) {
-        req.session.user = { username, isAdmin: true };
+        req.session.user = { username: username, isAdmin: true };
         return res.json({ success: true, message: 'Admin login successful' });
     }
 
     // Check user credentials in CouchDB
     usersDb.get(username, function(err, user) {
         if (err) {
-            return res.json({ success: false, message: 'User not found' });
-        }
-        if (user.password === password) {
-            req.session.user = { username, isAdmin: false };
+            // If user not found, attempt to register
+            usersDb.insert({ _id: username, username: username, password: password }, function(err, response) {
+                if (err) {
+                    return res.json({ success: false, message: 'Registration failed or user already exists' });
+                }
+                req.session.user = { username: username, isAdmin: false };
+                return res.json({ success: true, message: 'Registration and login successful' });
+            });
+        } else if (user.password === password) {
+            req.session.user = { username:username, isAdmin: false };
             return res.json({ success: true, message: 'User login successful' });
         } else {
             return res.json({ success: false, message: 'Incorrect password' });
@@ -175,7 +192,7 @@ app.post('/api/accounts/register', (req, res) => {
         }
 
         // Register the new user
-        usersDb.insert({ _id: username, password: password }, function(err, response) {
+        usersDb.insert({ _id: username, username: username, password: password }, function(err, response) {
             if (err) {
                 return res.json({ success: false, message: 'Registration failed' });
             }
@@ -203,7 +220,9 @@ app.get('/news', (req, res) => {
     res.render('news', {
         eternities: eternities_each,
         settings: settings,
-        waiver: false
+        waiver: false,
+        request: req,
+        user: req.session.user
     });
 });
 
