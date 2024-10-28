@@ -5,6 +5,7 @@ const databases = [
     settings.COUCHDB_PREFIX + 'waivers',
     settings.COUCHDB_PREFIX + 'eternities',
     settings.COUCHDB_PREFIX + 'users',
+    settings.COUCHDB_PREFIX + 'sessions',
     settings.COUCHDB_PREFIX + 'news' // Add the news database
 ];
 

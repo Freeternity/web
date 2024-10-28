@@ -9,6 +9,16 @@ var cookieSession = require('cookie-session');
 
 console.log('secure cookie secure?', process.env.secure_cookie);
 
+const Expression = require('couchdb-expression')(session);
+
+const store = new Expression({
+  username: process.env.admin_username,         // default value = 'admin'
+  password: process.env.admin_password,     // default value = 'password'
+  hostname: 'localhost',    // default value = 'localhost'
+  port: '5984',             // default value = 5984
+  database: 'freeternity_sessions',     // default value = 'sessions'
+  https: false              // default value = false
+});
 
 if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
@@ -35,9 +45,10 @@ if (process.env.secure_cookie === "true") {
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: true,
+        store: store,
         proxy: true,
         saveUninitialized: true,
-        cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {
@@ -60,6 +71,7 @@ if (process.env.secure_cookie === "true") {
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
         resave: true,
+        store: store,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
