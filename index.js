@@ -14,7 +14,7 @@ if (process.env.secure_cookie === "true") {
     secure_cookie = true;
     
     app.use(session({
-        secret: 'asfjdhag34474hifah347838939349jjks',
+        secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: false,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
