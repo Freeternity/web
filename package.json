@@ -13,9 +13,7 @@
     "nunjucks": "^3.1.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "passport-microsoft": "^2.1.0",
-    "react": "^16.4.1",
-    "strapi": "^3.6.11"
+    "passport-microsoft": "^2.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
