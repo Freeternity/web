@@ -1,7 +1,19 @@
 // express and nunjucks templating
+
+require('dotenv').config();
+
 const express = require('express');
 const expressNunjucks = require('express-nunjucks');
 const app = express();
+
+const session = require('express-session');
+
+app.use(session({
+    secret: 'asfjdhag34474hifah347838939349jjks',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true } // Set to true if using HTTPS
+}));
 
 //react framework
 const react = require('react');
@@ -37,12 +49,35 @@ module.exports = settings;
 app.set('views', __dirname + '/views');
 app.use('/static', express.static('public'))
 
+const adminAuth = require('./middleware/adminAuth');
+
+app.post('/admin/login', adminAuth, (req, res) => {
+    res.send('Logged in successfully');
+});
+
+const requireLogin = require('./middleware/requireLogin');
+
+const adminRoutes = require('./routes/adminRoutes');
+
+// Other configurations and middleware
+
+app.use('/admin', requireLogin, adminRoutes);
+// Other configurations and middleware
+
 const njk = expressNunjucks(app, {
     watch: isDev,
     noCache: isDev 
 });
 
 // cover landing page with the waiver and signature requirement
+// Create and use the users database
+var usersDbName = settings.COUCHDB_PREFIX + 'users';
+nano.db.create(usersDbName, function(err) {
+    if (err && err.statusCode !== 412) { // 412 indicates the database already exists
+        console.error('Error creating users database:', err);
+    }
+});
+var usersDb = nano.use(usersDbName);
 var waivers = nano.db.create(settings.COUCHDB_PREFIX+'waivers');
 var waivers = nano.use(settings.COUCHDB_PREFIX+'waivers');
 
@@ -107,6 +142,47 @@ if (settings.LOCAL && settings.FAKE_INSERT) {
 
 /////////////////////////////////////////////////////////////////////////////////
 
+app.post('/api/accounts/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Check if the user is logging in as an admin
+    if (username === admin_username && password === admin_password) {
+        req.session.user = { username, isAdmin: true };
+        return res.json({ success: true, message: 'Admin login successful' });
+    }
+
+    // Check user credentials in CouchDB
+    usersDb.get(username, function(err, user) {
+        if (err) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+        if (user.password === password) {
+            req.session.user = { username, isAdmin: false };
+            return res.json({ success: true, message: 'User login successful' });
+        } else {
+            return res.json({ success: false, message: 'Incorrect password' });
+        }
+    });
+});
+
+app.post('/api/accounts/register', (req, res) => {
+    const { username, password } = req.body;
+
+    // Check if the user already exists
+    usersDb.get(username, function(err, user) {
+        if (!err) {
+            return res.json({ success: false, message: 'User already exists' });
+        }
+
+        // Register the new user
+        usersDb.insert({ _id: username, password: password }, function(err, response) {
+            if (err) {
+                return res.json({ success: false, message: 'Registration failed' });
+            }
+            res.json({ success: true, message: 'Registration successful' });
+        });
+    });
+});
 app.get('/', (req, res) => {
     res.render('waiver', {settings: settings, waiver: true});
 });

@@ -5,10 +5,15 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "dotenv": "^16.4.5",
     "express": "^4.16.3",
     "express-nunjucks": "^2.2.3",
+    "express-session": "^1.18.1",
     "nano": "^6.4.3",
     "nunjucks": "^3.1.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-microsoft": "^2.1.0",
     "react": "^16.4.1",
     "strapi": "^3.6.11"
   },

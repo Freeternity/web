@@ -1,3 +1,7 @@
+home/user/*
+home/user
+./home/user
+./home/user/*
 node_modules
 node_modules/*
 ./node_modules

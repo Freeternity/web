@@ -4,11 +4,7 @@ const settings = require('./index.js');
 const databases = [
     settings.COUCHDB_PREFIX + 'waivers',
     settings.COUCHDB_PREFIX + 'eternities',
-<<<<<<< HEAD
     settings.COUCHDB_PREFIX + 'news' // Add the news database
-=======
-    settings.COUCHDB_PREFIX + 'comparisons'
->>>>>>> 40008df (recreate script created)
 ];
 
 databases.forEach(dbName => {
@@ -19,8 +15,4 @@ databases.forEach(dbName => {
             console.log(`Database ${dbName} created successfully.`);
         }
     });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 40008df (recreate script created)

@@ -1,6 +1,11 @@
-{% extends 'index.html' %} 
+{% extends 'index.html' %}
 
 {% block css %}
+
+    <style>
+        .actions { margin-top: 10px; }
+    </style>
+
     <style>
         section#shiurs .list-group-item {
             text-align: left;
@@ -32,7 +37,84 @@
     </style>
 {% endblock %}
 
+{% block jsfooter %}
+    <script>
+        $(document).ready(function () {
+            console.log('DOM fully loaded and parsed');
+            const form = document.getElementById('newsForm');
+            const newsList = document.getElementById('newsList');
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const id = document.getElementById('newsId').value;
+                const msg = document.getElementById('msg').value;
+                const username_posting = document.getElementById('username_posting').value;
+                const date_posted = document.getElementById('date_posted').value;
+
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `/admin/news/${id}` : '/admin/news';
+
+                fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ msg, username_posting, date_posted })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.success || data.error);
+                    form.reset();
+                    loadNews();
+                });
+            });
+
+            function loadNews() {
+                fetch('/admin/news')
+                    .then(response => response.json())
+                    .then(data => {
+                        newsList.innerHTML = '';
+                        data.forEach(news => {
+                            const div = document.createElement('div');
+                            div.className = 'news';
+                            div.innerHTML = `
+                                <p>${news.msg}</p>
+                                <p><strong>Username:</strong> ${news.username_posting}</p>
+                                <p><strong>Date Posted:</strong> ${news.date_posted}</p>
+                                <div class="actions">
+                                    <button onclick="editNews('${news._id}', '${news.msg}', '${news.username_posting}', '${news.date_posted}')">Edit</button>
+                                    <button onclick="deleteNews('${news._id}')">Delete</button>
+                                </div>
+                            `;
+                            newsList.appendChild(div);
+                        });
+                    });
+            }
+
+            window.editNews = function(id, msg, username_posting, date_posted) {
+                document.getElementById('newsId').value = id;
+                document.getElementById('msg').value = msg;
+                document.getElementById('username_posting').value = username_posting;
+                document.getElementById('date_posted').value = date_posted;
+            };
+
+            window.deleteNews = function(id) {
+                if (confirm('Are you sure you want to delete this news article?')) {
+                    fetch(`/admin/news/${id}`, { method: 'DELETE' })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.success || data.error);
+                            loadNews();
+                        });
+                }
+            };
+
+            loadNews();
+        });
+    </script>
+{% endblock %}
+
 {% block js %}
+
+
     <script>
         var BaseHome = this.BaseHome = {
             logout: function() {
@@ -46,6 +128,30 @@
             }
         };
     </script>
+    <script>
+        function handleLogin() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+    
+            fetch('/api/accounts/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 {% endblock %}
 
 {% block header_msg %}
@@ -57,34 +163,11 @@
 {% endblock %}
 
 {% block content %}
-    {% if hi_video %}
-        <!-- Intro Header -->
-        <header class="intro">
-            <div class="intro-body">
-                <div class="container" style='padding-left:0;'>
-                    <div class="row">
-                        <div class="col-md-8 col-md-offset-2">
-                            {% if hi_video %}
-                                <span id='daily_shiur_span' class="btn btn-primary btn-lg" style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis;' href="" role="button">{{daily_shiur.title}}</span><Br/><br/>
-                                <h1 class="brand-heading brand-daily-shiur" style='display:none;padding-left:15px;'>{{hi_video.title}}</h1>
-                                {% if hi_video.video_url %}
-                                    <iframe id="player_1" style="margin-left: 20px;" src="{{daily_shiur.video_url}}" frameborder="0" width="90%" height="300"></iframe>
-                                {% endif %}
-                                <div>
-                                    <button class='btn'><i class='glyphicon glyphicon-chevron-left'></i></button>
-                                    <button class='btn'><i class='glyphicon glyphicon-chevron-right'></i></button>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-    {% endif %}
 
     <section id="news" class="container content-section text-center">
         <br/><br/>
-        
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-news-form">Submit News</button>
+        <br/><br/>
         {% for news_item in news %}
             <div class="modal-content">
                 <div class="modal-header">
@@ -130,4 +213,5 @@
 {% block modal %}
     {% include "modals/modal_login.html" %}
     {% include "modals/modal_record.html" %}
+    {% include "modals/modal_news.html" %}
 {% endblock %}
