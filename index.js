@@ -28,31 +28,16 @@ if (process.env.secure_cookie === "true") {
 
     }));*/
 
-    app.set('trust proxy', 1); // Trust the first proxy
-    
-    app.use(session({
-        secret: 'secret4389484', // Replace with a strong secret
-        resave: false, // Set to false to avoid unnecessary session resaving
-        saveUninitialized: false, // Set to false to avoid saving uninitialized sessions
-        cookie: {
-            secure: process.env.secure_cookie === 'true', // Ensure cookies are only sent over HTTPS
-            httpOnly: true, // Prevent JavaScript access to cookies
-            sameSite: 'lax', // Restrict cross-site cookie access
-            maxAge: 24 * 60 * 60 * 1000, // 24 hours
-            domain: '.freeternity.com' // Ensure this matches your live site domain
-        }
-    }));
-
     console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
     
-    /*app.enable('trust proxy', 1);
+    app.enable('trust proxy', 1);
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: true,
         proxy: true,
         saveUninitialized: true,
         cookie: { secure: secure_cookie, sameSite: 'lax', maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
-    }));*/
+    }));
 
   } else {
     // Code to execute if MY_FLAG is false
