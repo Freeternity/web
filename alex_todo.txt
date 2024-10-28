@@ -1,2 +1,0 @@
-* get the api code from ebay
-* build out the user interface for the front-end of the supplements review (the new home page)
