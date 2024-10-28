@@ -185,6 +185,7 @@
             if (logoutSection) {
                 logoutSection.style.display = 'block';
                 document.querySelector('#logout h2').textContent = username;
+                $('#logout-section-username').text(username);
             }
         }
 
@@ -249,7 +250,7 @@
     <section id="logout-section" class="container content-section text-center" style="display: {% if user %}block{% else %}none{% endif %};">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">
-                <h2>{{ user.username }}</h2>
+                <h2 id="logout-section-username">{{ user.username }}</h2>
                 <p>
                     <button data-toggle='#modal-logout' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Logout</button>
                 </p>
