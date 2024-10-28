@@ -46,6 +46,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+        function publishNews(id) {
+            $.ajax({
+                url: `/admin/news/${id}/publish`,
+                method: 'POST',
+                success: function(data) {
+                    alert(data.success || data.error);
+                    loadNews();
+                }
+            });
+        }
     }
 
     window.editNews = function(id, msg, username_posting) {

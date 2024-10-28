@@ -7,6 +7,7 @@ const app = express();
 const session = require('express-session');
 
 console.log('secure cookie secure?', process.env.secure_cookie);
+app.enable('trust proxy');
 
 if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
@@ -16,6 +17,8 @@ if (process.env.secure_cookie === "true") {
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: false,
+        proxy: true,
+        key: 'session.sid',
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
@@ -98,24 +101,21 @@ nano.db.create(usersDbName, function(err) {
     }
 });
 var usersDb = nano.use(usersDbName);
-var waivers = nano.db.create(settings.COUCHDB_PREFIX+'waivers');
 var waivers = nano.use(settings.COUCHDB_PREFIX+'waivers');
 
 /////////////////////////////////////////////////////////////////////////////////
 
 // list of news or text boxes on the cover page
-var eternities = nano.db.create(settings.COUCHDB_PREFIX+'eternities');
-var eternities = nano.use(settings.COUCHDB_PREFIX+'eternities');
+var news = nano.use(settings.COUCHDB_PREFIX+'news');
+var news_each = [];
 
-var eternities_each = [];
-
-eternities.list(function(err, body) {
+news.list(function(err, body) {
   if (!err) {
-    console.log('hi eternities loop')
+    console.log('hi news loop')
     body.rows.forEach(function(doc) {
         console.log(doc.id);
-        eternities.get(doc.id, function(err,eternity) {
-            eternities_each.push(eternity);
+        news.get(doc.id, function(err,news_selected) {
+            news_each.push(news_selected);
         });
     });
   } else {
@@ -236,7 +236,7 @@ app.post('/api/waiver/', (req, res) => {
 
 app.get('/news', (req, res) => {
     res.render('news', {
-        eternities: eternities_each,
+        news_each: news_each,
         settings: settings,
         waiver: false,
         request: req,

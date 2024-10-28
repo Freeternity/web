@@ -217,7 +217,8 @@
         <br/><br/>
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-news-form">Submit News</button>
         <br/><br/>
-        {% for news_item in news %}
+        
+        {% for news_item in news_each %}
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -246,7 +247,7 @@
             </div>
         </div>
     </section>
-    
+
     <section id="logout-section" class="container content-section text-center" style="display: {% if user %}block{% else %}none{% endif %};">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2">

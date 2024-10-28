@@ -8,6 +8,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const newsDb = nano.use(settings.COUCHDB_PREFIX + 'news');
+app.get('/news', (req, res) => {
+    newsDb.list({ include_docs: true }, (err, body) => {
+        if (err) {
+            console.log('Error retrieving news:', err.message);
+            return res.status(500).send({ error: 'Error retrieving news' });
+        }
+        const news = body.rows.map(row => row.doc);
+        res.render('news.html', { news, user: req.session.user });
+    });
+});
 
 // Endpoint to retrieve all news articles
 app.get('/admin/news', (req, res) => {
@@ -30,6 +40,23 @@ app.post('/admin/news', (req, res) => {
             return res.status(500).send({ error: 'Error publishing news' });
         }
         res.send({ success: 'News published successfully', id: body.id });
+    });
+});
+app.post('/admin/news/:id/publish', (req, res) => {
+    const newsId = req.params.id;
+    newsDb.get(newsId, (err, doc) => {
+        if (err) {
+            console.log('Error retrieving news item:', err.message);
+            return res.status(500).send({ error: 'Error retrieving news item' });
+        }
+        doc.pending = false;
+        newsDb.insert(doc, (err, body) => {
+            if (err) {
+                console.log('Error publishing news:', err.message);
+                return res.status(500).send({ error: 'Error publishing news' });
+            }
+            res.send({ success: 'News published successfully' });
+        });
     });
 });
 
