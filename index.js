@@ -42,6 +42,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 // dev environment
 const isDev = app.get('env') === 'development';
+console.log("isDev:", isDev)
 const admin_username = process.env.admin_username;
 const admin_password = process.env.admin_password;
 
@@ -55,7 +56,7 @@ settings.HTML_ONLY = true;
 settings.DOMAIN = 'localhost';
 settings.EMAIL = 'longevity@freeternity.com'
 settings.COUCHDB_PREFIX = 'freeternity_';
-settings.LOCAL = true;
+settings.LOCAL = false;
 settings.PORT = 3636;
 settings.NAME = 'Freeternity';
 settings.FAKE_INSERT = false;
@@ -183,22 +184,21 @@ app.post('/api/accounts/login', (req, res) => {
     // Check user credentials in CouchDB
     usersDb.get(username, function(err, user) {
         if (err) {
-            // If user not found, attempt to register
-            usersDb.insert({ _id: username, username: username, password: password }, function(err, response) {
-                if (err) {
-                    return res.json({ success: false, message: 'Registration failed or user already exists' });
-                }
-                req.session.user = { username: username, isAdmin: false };
-                return res.json({ success: true, message: 'Registration and login successful' });
-            });
-        } else if (user.password === password) {
-            req.session.user = { username:username, isAdmin: false };
-            return res.json({ success: true, message: 'User login successful' });
-        } else {
+            // If user not found, return an error
+            return res.json({ success: false, message: 'User not found' });
+        /**
+         * Sets the user session with the provided username and admin status.
+         *
+         * @param {Object} req - The request object from the client.
+         * @param {string} username - The username of the user to be set in the session.
+         * @returns {void} This function does not return a value.
+         */
+        req.session.user = { username: username, isAdmin: false };
             return res.json({ success: false, message: 'Incorrect password' });
         }
     });
 });
+
 
 app.post('/api/accounts/register', (req, res) => {
     const { username, password } = req.body;
