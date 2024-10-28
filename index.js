@@ -7,20 +7,19 @@ const app = express();
 const session = require('express-session');
 
 console.log('secure cookie secure?', process.env.secure_cookie);
-app.enable('trust proxy');
+
 
 if (process.env.secure_cookie === "true") {
     // Code to execute if MY_FLAG is true
     console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
     secure_cookie = true;
-    
+    app.enable('trust proxy', 1);
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
-        resave: false,
+        resave: true,
         proxy: true,
-        key: 'session.sid',
         saveUninitialized: true,
-        cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: secure_cookie, sameSite: 'lax', httpOnly: false } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {
