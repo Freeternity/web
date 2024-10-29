@@ -4,14 +4,7 @@ module.exports = function(req, res, next) {
     if (req.session && req.session.user) {
         req.user = req.session.user;
     } else {
-        reqconst express = require('express');
-        const app = express();
-        const userMiddleware = require('./middleware/userMiddleware');
-        
-        // Use the middleware
-        app.use(userMiddleware);
-        
-        // Your existing routes and logic.user = { is_authenticated: false };
+        req.user = { is_authenticated: false };
     }
     next();
 };

@@ -11,6 +11,10 @@ const expressNunjucks = require('express-nunjucks');
 const session = require('express-session');
 connect = require('connect');
 ConnectCouchDB = require('connect-couchdb')(session);
+const userMiddleware = require('./middleware/userMiddleware');
+
+
+
 
 var store = new ConnectCouchDB({
     // Name of the database you would like to use for sessions.
@@ -41,6 +45,9 @@ var store = new ConnectCouchDB({
 var cookieSession = require('cookie-session');
 
 const app = express();
+
+// Use the user middleware
+app.use(userMiddleware);
 
 console.log('secure cookie secure?', process.env.secure_cookie);
 
@@ -280,6 +287,7 @@ app.post('/api/accounts/register', (req, res) => {
     });
 });
 app.get('/', (req, res) => {
+    console.log('Hello, ' + (req.user.is_authenticated ? 'authenticated user' : 'guest'));
     res.render('waiver', {settings: settings, waiver: true});
 });
 
