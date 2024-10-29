@@ -15,6 +15,10 @@ const userMiddleware = require('./middleware/userMiddleware');
 // Add this near the top of your file with other requires
 const sessionDebugMiddleware = require('./middleware/sessionDebugMiddleware');
 
+console.log('Secure cookie:', process.env.secure_cookie);
+console.log('Admin username set:', !!process.env.admin_username);
+console.log('Admin password set:', !!process.env.admin_password);
+
 var store = new ConnectCouchDB({
     // Name of the database you would like to use for sessions.
     name: 'freeternity_sessions',
