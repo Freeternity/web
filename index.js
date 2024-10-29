@@ -1,5 +1,11 @@
 require('dotenv').config();
 
+const fs = require('fs');
+const https = require('https');
+
+const key = fs.readFileSync('ssl/localhost-key.pem');
+const cert = fs.readFileSync('ssl/localhost.pem');
+
 const express = require('express');
 const expressNunjucks = require('express-nunjucks');
 const session = require('express-session');
@@ -321,5 +327,9 @@ app.get('/yivwiy.html', (req, res) => {
 });
 
 console.log('listening on port 3000');
-app.listen(3000);
+//app.listen(3000);
+
+https.createServer({ key, cert }, app).listen(3000, () => {
+    console.log('Server listening on https://localhost:3000');
+  });
 
