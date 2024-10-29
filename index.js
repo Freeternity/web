@@ -3,6 +3,35 @@ require('dotenv').config();
 const express = require('express');
 const expressNunjucks = require('express-nunjucks');
 const session = require('express-session');
+connect = require('connect');
+ConnectCouchDB = require('connect-couchdb')(session);
+
+var store = new ConnectCouchDB({
+    // Name of the database you would like to use for sessions.
+    name: 'freeternity_sessions',
+  
+    // Optional. Database connection details. See yacw documentation 
+    // for more informations
+    username: process.env.admin_username, 
+    password: process.env.admin_password, 
+    host: 'localhost',
+  
+    // Optional. How often expired sessions should be cleaned up.
+    // Defaults to 600000 (10 minutes).
+    reapInterval: 600000,
+  
+    // Optional. How often to run DB compaction against the session
+    // database. Defaults to 300000 (5 minutes).
+    // To disable compaction, set compactInterval to -1
+    compactInterval: 300000,
+  
+    // Optional. How many time between two identical session store
+    // Defaults to 60000 (1 minute)
+    setThrottle: 60000
+  });
+  var server = connect();
+  server.use(session({secret: 'asdfadf788asf7as8f7d7', store: store }));
+
 var cookieSession = require('cookie-session');
 
 const app = express();
@@ -30,13 +59,14 @@ if (process.env.secure_cookie === "true") {
 
     console.log("secure_cookie is true ", typeof(process.env.secure_cookie));
     
-    app.enable('trust proxy');
+    app.enable('trust proxy', 1);
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         resave: true,
         proxy: true,
+        store: store,
         saveUninitialized: true,
-        cookie: { secure: false, sameSite: 'lax', httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: false, sameSite: 'none', httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {
@@ -59,6 +89,7 @@ if (process.env.secure_cookie === "true") {
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
         resave: true,
+        store: store,
         saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
@@ -222,7 +253,7 @@ app.post('/api/accounts/login', (req, res) => {
          * @param {string} username - The username of the user to be set in the session.
          * @returns {void} This function does not return a value.
          */
-        req.session.user = { username: username, isAdmin: false };
+        //req.session.user = { username: username, isAdmin: false };
             return res.json({ success: false, message: 'Incorrect password' });
         }
     });
