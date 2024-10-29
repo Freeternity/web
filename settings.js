@@ -6,7 +6,7 @@ settings.DOMAIN = 'localhost';
 settings.EMAIL = 'longevity@freeternity.com'
 settings.COUCHDB_PREFIX = 'freeternity_';
 settings.LOCAL = true;
-settings.PORT = 3636;
+settings.PORT = 3000;
 settings.NAME = 'Freeternity';
 
 module.exports = settings;
