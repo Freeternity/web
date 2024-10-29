@@ -72,7 +72,7 @@ if (process.env.secure_cookie === "true") {
         proxy: true,
         store: store,
         saveUninitialized: true,
-        cookie: { secure: false, httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: secure_cookie, httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {
@@ -330,6 +330,6 @@ console.log('listening on port 3000');
 //app.listen(3000);
 
 https.createServer({ key, cert }, app).listen(3000, () => {
-    console.log('Server listening on https://localhost:3000');
+   console.log('Server listening on https://localhost:3000');
   });
 
