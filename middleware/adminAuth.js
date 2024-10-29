@@ -2,7 +2,7 @@ module.exports = function(req, res, next) {
     console.log('adminAuth middleware called');
     console.log('Session:', req.session);
     console.log('Body:', req.body);
-
+    console.log('admin username:', process.env.admin_username);
     const { username, password } = req.body;
 
     if (username === process.env.admin_username && password === process.env.admin_password) {
