@@ -127,8 +127,9 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 const isDev = app.get('env') === 'development';
 console.log("isDev:", isDev)
 const admin_username = process.env.admin_username;
+console.log("admin_username:", admin_username)
 const admin_password = process.env.admin_password;
-
+console.log("admin_password set:", !!admin_password)
 // couchdb
 var nano = require('nano')('http://'+ admin_username + ':' + admin_password + '@localhost:5984');
 
