@@ -53,8 +53,6 @@ var store = new ConnectCouchDB({
 var cookieSession = require('cookie-session');
 
 const app = express();
-// Add this after your session configuration
-app.use(sessionDebugMiddleware);
 
 // Use the user middleware
 app.use(userMiddleware);
@@ -324,7 +322,7 @@ app.get('/yivwiy.html', (req, res) => {
 console.log('listening on port 3000');
 //app.listen(3000);
 
-const port = process.env.PORT || settings.PORT || 3000;
+const port = settings.PORT || 3000;
 
 app.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`);
