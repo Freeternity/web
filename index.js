@@ -2,10 +2,10 @@ require('dotenv').config();
 
 const express = require('express');
 const expressNunjucks = require('express-nunjucks');
-const app = express();
-
 const session = require('express-session');
 var cookieSession = require('cookie-session');
+
+const app = express();
 
 console.log('secure cookie secure?', process.env.secure_cookie);
 
