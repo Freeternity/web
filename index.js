@@ -322,9 +322,9 @@ app.get('/yivwiy.html', (req, res) => {
 });
 
 console.log('listening on port 3000');
-//app.listen(3000);
+app.listen(3000);
 
-https.createServer({ key, cert }, app).listen(3000, () => {
+/*https.createServer({ key, cert }, app).listen(3000, () => {
    console.log('Server listening on https://localhost:3000');
-  });
+  });*/
 
