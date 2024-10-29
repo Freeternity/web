@@ -161,11 +161,7 @@ const njk = expressNunjucks(app, {
 // cover landing page with the waiver and signature requirement
 // Create and use the users database
 var usersDbName = settings.COUCHDB_PREFIX + 'users';
-nano.db.create(usersDbName, function(err) {
-    if (err && err.statusCode !== 412) { // 412 indicates the database already exists
-        console.error('Error creating users database:', err);
-    }
-});
+
 var usersDb = nano.use(usersDbName);
 var waivers = nano.use(settings.COUCHDB_PREFIX+'waivers');
 
@@ -193,7 +189,6 @@ news.list(function(err, body) {
 
 
 // comparisons of different eternities providers like calico labs
-var comparisons = nano.db.create(settings.COUCHDB_PREFIX+'comparisons')
 var comparisons = nano.use(settings.COUCHDB_PREFIX+'comparisons');
 var comparisons_each = [];
 
