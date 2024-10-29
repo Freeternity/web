@@ -66,7 +66,7 @@ if (process.env.secure_cookie === "true") {
         proxy: true,
         store: store,
         saveUninitialized: true,
-        cookie: { secure: false, sameSite: 'none', httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
+        cookie: { secure: false, httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
   } else {
