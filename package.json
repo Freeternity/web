@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "connect": "^3.7.0",
     "connect-couchdb": "^1.0.0",
     "cookie-session": "^2.1.0",
     "couchdb-expression": "^1.6.1",

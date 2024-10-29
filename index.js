@@ -12,9 +12,8 @@ const session = require('express-session');
 connect = require('connect');
 ConnectCouchDB = require('connect-couchdb')(session);
 const userMiddleware = require('./middleware/userMiddleware');
-
-
-
+// Add this near the top of your file with other requires
+const sessionDebugMiddleware = require('./middleware/sessionDebugMiddleware');
 
 var store = new ConnectCouchDB({
     // Name of the database you would like to use for sessions.
@@ -37,7 +36,16 @@ var store = new ConnectCouchDB({
   
     // Optional. How many time between two identical session store
     // Defaults to 60000 (1 minute)
-    setThrottle: 60000
+    setThrottle: 60000,
+
+    connectionListener: function(err) {
+        if (err) {
+            console.error('CouchDB session store connection error:', err);
+        } else {
+            console.log('CouchDB session store connected successfully');
+        }
+    }
+
   });
   var server = connect();
   server.use(session({secret: 'asdfadf788asf7as8f7d7', store: store }));
@@ -45,6 +53,8 @@ var store = new ConnectCouchDB({
 var cookieSession = require('cookie-session');
 
 const app = express();
+// Add this after your session configuration
+app.use(sessionDebugMiddleware);
 
 // Use the user middleware
 app.use(userMiddleware);
@@ -75,10 +85,8 @@ if (process.env.secure_cookie === "true") {
     app.enable('trust proxy', 1);
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
-        resave: true,
         proxy: true,
         store: store,
-        saveUninitialized: true,
         cookie: { secure: secure_cookie, httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
@@ -101,13 +109,14 @@ if (process.env.secure_cookie === "true") {
     
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
-        resave: true,
         store: store,
-        saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
   }
 
+
+// Add this after your session configuration
+app.use(sessionDebugMiddleware);
 
 // https://stackoverflow.com/questions/5710358/how-to-retrieve-post-query-parameters/12008719#12008719
 var bodyParser = require('body-parser');
@@ -133,7 +142,7 @@ settings.DOMAIN = 'localhost';
 settings.EMAIL = 'longevity@freeternity.com'
 settings.COUCHDB_PREFIX = 'freeternity_';
 settings.LOCAL = false;
-settings.PORT = 3636;
+settings.PORT = 3000;
 settings.NAME = 'Freeternity';
 settings.FAKE_INSERT = false;
 module.exports = settings;
@@ -182,7 +191,6 @@ news.list(function(err, body) {
   if (!err) {
     console.log('hi news loop')
     body.rows.forEach(function(doc) {
-        console.log(doc.id);
         news.get(doc.id, function(err,news_selected) {
             news_each.push(news_selected);
         });
@@ -203,7 +211,6 @@ comparisons.list(function(err, body) {
   if (!err) {
     console.log('hi comparisons loop')
     body.rows.forEach(function(doc) {
-        console.log(doc.id);
         comparisons.get(doc.id, function(err,provider) {
             comparisons_each.push(provider);
         });
@@ -212,21 +219,6 @@ comparisons.list(function(err, body) {
       console.log("error", err);
   }
 });
-
-/////////////////////////////////////////////////////////////////////////////////
-//                      fake insert as a test
-/////////////////////////////////////////////////////////////////////////////////
-
-if (settings.LOCAL && settings.FAKE_INSERT) {
-    eternities.insert({ title: "hi", message: "message", author: "author" }, function(err, body, header) {
-      if (err) {
-        console.log('[.insert] ', err.message);
-      } else {
-          console.log('you have added to the eternity.', body)
-      }
-    });
-} //endif
-
 
 /////////////////////////////////////////////////////////////////////////////////
 // Add this route to handle logout requests
@@ -330,7 +322,17 @@ app.get('/yivwiy.html', (req, res) => {
 });
 
 console.log('listening on port 3000');
-app.listen(3000);
+//app.listen(3000);
+
+const port = process.env.PORT || settings.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`);
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Secure cookie:', process.env.secure_cookie);
+    console.log('Admin username set:', !!process.env.admin_username);
+    console.log('Admin password set:', !!process.env.admin_password);
+});
 
 /*https.createServer({ key, cert }, app).listen(3000, () => {
    console.log('Server listening on https://localhost:3000');
