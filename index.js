@@ -14,6 +14,12 @@ ConnectCouchDB = require('connect-couchdb')(session);
 const userMiddleware = require('./middleware/userMiddleware');
 // Add this near the top of your file with other requires
 const sessionDebugMiddleware = require('./middleware/sessionDebugMiddleware');
+var cookieSession = require('cookie-session');
+
+const app = express();
+
+//app.use(express.bodyParser());
+//app.use(express.cookieParser());
 
 console.log('Secure cookie:', process.env.secure_cookie);
 console.log('Admin username set:', !!process.env.admin_username);
@@ -54,10 +60,6 @@ var store = new ConnectCouchDB({
   var server = connect();
   server.use(session({secret: 'asdfadf788asf7as8f7d7', store: store }));
 
-var cookieSession = require('cookie-session');
-
-const app = express();
-
 // Use the user middleware
 app.use(userMiddleware);
 
@@ -89,6 +91,8 @@ if (process.env.secure_cookie === "true") {
         secret: 'asfjdhag34474hifah347838939349jjks489934sjkdjksdjkjksd',
         proxy: true,
         store: store,
+        resave: false,
+        saveUninitialized: true,
         cookie: { secure: secure_cookie, httpOnly:false, maxAge: 24000000 * 60 * 60 * 1000, domain: '.freeternity.com' } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
 
@@ -112,6 +116,8 @@ if (process.env.secure_cookie === "true") {
     app.use(session({
         secret: 'asfjdhag34474hifah347838939349jjks3489489sdkkskjj348993',
         store: store,
+        resave: false,
+        saveUninitialized: true,
         cookie: { secure: secure_cookie } // Set to true if using HTTPS secure: process.env.secure_cookie
     }));
   }
@@ -249,19 +255,18 @@ app.post('/api/accounts/login', (req, res) => {
         if (err) {
             // If user not found, return an error
             return res.json({ success: false, message: 'User not found' });
-        /**
-         * Sets the user session with the provided username and admin status.
-         *
-         * @param {Object} req - The request object from the client.
-         * @param {string} username - The username of the user to be set in the session.
-         * @returns {void} This function does not return a value.
-         */
-        //req.session.user = { username: username, isAdmin: false };
+        }
+        
+        // Here you should implement proper password hashing and comparison
+        // For this example, we're doing a simple comparison
+        if (user.password === password) {
+            req.session.user = { username: username, isAdmin: false };
+            return res.json({ success: true, message: 'Login successful' });
+        } else {
             return res.json({ success: false, message: 'Incorrect password' });
         }
     });
 });
-
 
 app.post('/api/accounts/register', (req, res) => {
     const { username, password } = req.body;
@@ -277,6 +282,8 @@ app.post('/api/accounts/register', (req, res) => {
             if (err) {
                 return res.json({ success: false, message: 'Registration failed' });
             }
+            // Set the session for the new user
+            req.session.user = { username: username, isAdmin: false };
             res.json({ success: true, message: 'Registration successful' });
         });
     });
