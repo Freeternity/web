@@ -196,6 +196,21 @@ var waivers = nano.use(settings.COUCHDB_PREFIX+'waivers');
 var news = nano.use(settings.COUCHDB_PREFIX+'news');
 var news_each = [];
 
+/* news.list(function(err, body) {
+  if (!err) {
+    console.log('hi news loop')
+    body.rows.forEach(function(doc) {
+        news.get(doc.id, function(err,news_selected) {
+            news_each.push(news_selected);
+        });
+    });
+  } else {
+      console.log("error", err);
+  }
+}); */
+
+// Remove this block
+/*
 news.list(function(err, body) {
   if (!err) {
     console.log('hi news loop')
@@ -207,6 +222,54 @@ news.list(function(err, body) {
   } else {
       console.log("error", err);
   }
+});
+*/
+
+// Keep your refreshNewsList function
+function refreshNewsList() {
+    news_each = [];
+    news.list(function(err, body) {
+        if (!err) {
+            body.rows.forEach(function(doc) {
+                news.get(doc.id, function(err, news_selected) {
+                    if (!err && !news_selected.pending) {
+                        news_each.push(news_selected);
+                    }
+                });
+            });
+        } else {
+            console.log("Error refreshing news:", err);
+        }
+    });
+}
+
+// Call refreshNewsList when the server starts
+refreshNewsList();
+
+// Modify the /news route
+app.get('/news', (req, res) => {
+    refreshNewsList(); // Refresh the list before rendering
+    setTimeout(() => { // Wait a short time for the async operations to complete
+        res.render('news', {
+            news_each: news_each,
+            settings: settings,
+        });
+    }, 1000); // Adjust this delay as needed
+});
+
+// Add this to your news update routes (POST and PUT)
+app.post('/api/news', (req, res) => {
+    // Your existing code here
+    // After successfully adding/updating news
+    refreshNewsList();
+    res.send({ success: 'News published successfully', id: body.id });
+});
+
+app.put('/api/news/:id', (req, res) => {
+    // Your existing code here
+    // After successfully updating news
+    refreshNewsList();
+    res.send({ success: 'News updated successfully', id: body.id });
 });
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -306,6 +369,7 @@ app.post('/api/waiver/', (req, res) => {
 });
 
 app.get('/news', (req, res) => {
+    refreshNewsList();
     res.render('news', {
         news_each: news_each,
         settings: settings,
