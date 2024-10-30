@@ -353,7 +353,7 @@ app.post('/api/accounts/register', (req, res) => {
 });
 app.get('/', (req, res) => {
     console.log('Hello, ' + (req.user.is_authenticated ? 'authenticated user' : 'guest'));
-    res.render('waiver', {settings: settings, waiver: true});
+    res.render('waiver', {settings: settings, waiver: true, res: res});
 });
 
 app.post('/api/waiver/', (req, res) => {
