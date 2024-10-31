@@ -82,7 +82,10 @@ async function saveNewsToDb(newsArticles) {
         };
 
         try {
+            console.log('Checking for existing article with URL:', article.url);
             const existing = await newsDb.find({ selector: { url: article.url } });
+            console.log('Existing articles found:', existing.docs.length);
+
             if (existing && existing.docs && existing.docs.length === 0) {
                 await newsDb.insert(newsDoc);
                 console.log('News article saved:', newsDoc.title);
