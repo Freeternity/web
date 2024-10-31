@@ -6,6 +6,7 @@
     </style>
 
     <style>
+
         section#shiurs .list-group-item {
             text-align: left;
         }
@@ -213,12 +214,30 @@
 {% endblock %}
 
 {% block content %}
+
     <section id="news" class="container content-section text-center">
         <br/><br/>
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-news-form">Submit News</button>
         <br/><br/>
         
         {% for news_item in news_each %}
+            {% if news_item.url %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><a href='{{news_item.url}}' target="_blank">{{ news_item.title }}</a> - {{ news_item.source }}</h4>
+                </div>
+                <div class="row modal-body">
+                    <p>{{ news_item.description }}</p>
+                </div>
+                <div class="modal-footer">
+                    Published {{news_item.publishedAt}}
+                    <!--<button type="button" class="btn btn-info" data-dismiss="modal">Close</button>-->
+                </div>
+            </div>
+            <br/><br/>
+
+            {% else %}
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -232,8 +251,10 @@
                 </div>
             </div>
             <br/><br/>
+            {% endif %}
+
         {% endfor %}
-    </section> 
+    </section>
 
     {% if settings.ALLOW_LOGIN %}
     <!-- Login or register Section -->

@@ -13,6 +13,16 @@ router.get('/', (req, res) => {
         res.send(news);
     });
 });
+router.get('/news', (req, res) => {
+    newsDb.list({ include_docs: true }, (err, body) => {
+        if (err) {
+            console.log('Error retrieving news:', err.message);
+            return res.status(500).send({ error: 'Error retrieving news' });
+        }
+        const news = body.rows.map(row => row.doc);
+        res.render('news.html', { news });
+    });
+});
 
 // Post new news
 router.post('/', (req, res) => {

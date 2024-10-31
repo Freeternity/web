@@ -157,7 +157,7 @@ settings.FAKE_INSERT = false;
 module.exports = settings;
 
 app.set('views', __dirname + '/views');
-app.use('/static', express.static('public'))
+app.use('/static', express.static('static'))
 
 const adminAuth = require('./middleware/adminAuth');
 
@@ -234,6 +234,7 @@ function refreshNewsList() {
                 news.get(doc.id, function(err, news_selected) {
                     if (!err && !news_selected.pending) {
                         news_each.push(news_selected);
+                        console.log('News item added:', news_selected); // Log each news item
                     }
                 });
             });
@@ -242,7 +243,6 @@ function refreshNewsList() {
         }
     });
 }
-
 // Call refreshNewsList when the server starts
 refreshNewsList();
 
