@@ -4,15 +4,6 @@ const newsDb = nano.db.use('freeternity_news');
 const GOOGLE_NEWS_API_KEY = process.env.GOOGLE_NEWS_API_KEY;
 const BING_NEWS_API_KEY = process.env.BING_NEWS_API_KEY;
 
-if (!GOOGLE_NEWS_API_KEY) {
-    console.error('Error: GOOGLE_NEWS_API_KEY is not set.');
-    process.exit(1);
-}
-
-if (!BING_NEWS_API_KEY) {
-    console.error('Error: BING_NEWS_API_KEY is not set.');
-    process.exit(1);
-}
 const keywords = [
     'longevity',
     'living forever',
@@ -22,7 +13,7 @@ const keywords = [
 ];
 
 async function fetchGoogleNews() {
-    const fetch = (await import('node-fetch')).default;
+    const fetch = (await import('node-fetch')).default; // Use dynamic import
     console.log('Starting fetchGoogleNews');
     const query = keywords.join(' OR ');
     const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${GOOGLE_NEWS_API_KEY}`;
@@ -32,10 +23,6 @@ async function fetchGoogleNews() {
         const response = await fetch(url);
         console.log('Google News API response status:', response.status);
         const data = await response.json();
-        if (!data.articles) {
-            console.error('Error fetching Google News: No articles found');
-            return [];
-        }
         console.log('Fetched Google News articles:', data.articles.length);
         return data.articles;
     } catch (error) {
@@ -45,7 +32,7 @@ async function fetchGoogleNews() {
 }
 
 async function fetchBingNews() {
-    const fetch = (await import('node-fetch')).default;
+    const fetch = (await import('node-fetch')).default; // Use dynamic import
     console.log('Starting fetchBingNews');
     const query = keywords.join(' OR ');
     const url = `https://api.cognitive.microsoft.com/bing/v7.0/news/search?q=${encodeURIComponent(query)}`;
@@ -57,10 +44,6 @@ async function fetchBingNews() {
         });
         console.log('Bing News API response status:', response.status);
         const data = await response.json();
-        if (!data.value) {
-            console.error('Error fetching Bing News: No articles found');
-            return [];
-        }
         console.log('Fetched Bing News articles:', data.value.length);
         return data.value;
     } catch (error) {
@@ -82,9 +65,33 @@ async function saveNewsToDb(newsArticles) {
         };
 
         try {
-            console.log('Checking for existing article with URL:', article.url);
+            // Check if the article already exists in the database
             const existing = await newsDb.find({ selector: { url: article.url } });
-            console.log('Existing articles found:', existing.docs.length);
+
+            newsDb.find({
+                selector: {
+                    // Your search criteria here
+                    "url": {
+                        "$regex": article.url // Example: search for documents where 'field_name' contains 'search_term'
+                    }
+                },
+                limit: 10 // Limit the number of results
+                }, (err, result) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                    if (result.docs && result.docs.length === 0) {
+
+                        newsDb.insert(newsDoc);
+                        console.log('News article saved:', newsDoc.title);
+
+                    } else {
+
+                        console.log('not inserting in the database because it already exists there.');
+                    }
+                        // not in the database, save it
+                    console.log(result.docs); // Output the search results
+            });
 
             if (existing && existing.docs && existing.docs.length === 0) {
                 await newsDb.insert(newsDoc);
@@ -110,6 +117,7 @@ async function fetchNews() {
     console.log('Completed fetchNews');
 }
 
-setInterval(fetchNews, 3600000);
+// Schedule the fetchNews function to run periodically
+setInterval(fetchNews, 3600000); // Fetch news every hour
 fetchNews();
 
