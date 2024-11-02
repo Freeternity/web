@@ -171,6 +171,7 @@ const adminRoutes = require('./routes/adminRoutes');
 
 
 const newsRoutes = require('./routes/newsRoutes');
+const { request } = require('http');
 app.use('/api/news', newsRoutes);
 
 // Other configurations and middleware
@@ -234,7 +235,7 @@ function refreshNewsList() {
                 news.get(doc.id, function(err, news_selected) {
                     if (!err && !news_selected.pending) {
                         news_each.push(news_selected);
-                        console.log('News item added:', news_selected); // Log each news item
+                        //console.log('News item added:', news_selected); // Log each news item
                     }
                 });
             });
@@ -253,6 +254,8 @@ app.get('/news', (req, res) => {
         res.render('news', {
             news_each: news_each,
             settings: settings,
+            user: req.session.user,
+            session: req.session
         });
     }, 1000); // Adjust this delay as needed
 });

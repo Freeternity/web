@@ -1,3 +1,5 @@
+const session = require('express-session');
+
 module.exports = function(req, res, next) {
     console.log('--- Session Debug Middleware ---');
     console.log('Request URL:', req.url);
@@ -14,12 +16,12 @@ module.exports = function(req, res, next) {
         console.log('Session cookie:', req.session.cookie);
         
         // Log when the session was created
-        if (req.session.cookie.originalMaxAge) {
+        if (req.session.cookie && req.session.cookie.originalMaxAge) {
             console.log('Session created:', new Date(Date.now() - req.session.cookie.originalMaxAge));
         }
         
         // Log when the session will expire
-        if (req.session.cookie.expires) {
+        if (req.session.cookie && req.session.cookie.expires) {
             console.log('Session expires:', req.session.cookie.expires);
         }
     } else {
