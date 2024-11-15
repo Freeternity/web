@@ -65,7 +65,7 @@ async function fetchRssNews() {
             title: item.title,
             description: item.contentSnippet,
             url: item.link,
-            source: item.source || 'Google News RSS',
+            source: item.source || '',
             publishedAt: item.pubDate,
             pending: false
         }));
