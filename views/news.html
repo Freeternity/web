@@ -225,7 +225,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title"><a href='{{news_item.url}}' target="_blank">{{ news_item.title }}</a> - {{ news_item.source }}</h4>
+                    <h4 class="modal-title"><a href='{{news_item.url}}' target="_blank">{{ news_item.title }}</a>{% if news_item.source != "Google News RSS" %} - {{ news_item.source }}{% endif %}</h4>
                 </div>
                 <div class="row modal-body">
                     <p>{{ news_item.description }}</p>

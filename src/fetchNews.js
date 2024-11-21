@@ -106,7 +106,7 @@ async function saveNewsToDb(newsArticles) {
                     if (err) {
                         console.error(err);
                     }
-                    if (result.docs && result.docs.length === 0) {
+                    if (result && result.docs && result.docs.length === 0) {
 
                         newsDb.insert(newsDoc);
                         console.log('News article saved:', newsDoc.title);
