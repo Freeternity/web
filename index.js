@@ -235,7 +235,7 @@ function refreshNewsList() {
                 news.get(doc.id, function(err, news_selected) {
                     if (!err && !news_selected.pending) {
                         news_each.push(news_selected);
-                        //console.log('News item added:', news_selected); // Log each news item
+                        console.log('News item added:', news_selected); // Log each news item
                     }
                 });
             });

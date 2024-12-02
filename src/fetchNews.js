@@ -1,3 +1,4 @@
+require('dotenv').config();
 const nano = require('nano')('http://'+process.env.admin_username+':'+process.env.admin_password+'@localhost:5984');
 const newsDb = nano.db.use('freeternity_news');
 const Parser = require('rss-parser');
