@@ -361,7 +361,7 @@ app.get('/', (req, res) => {
 
 app.post('/api/waiver/', (req, res) => {
     console.log('/api/waiver/: ' + req.body.signature);
-        waivers.insert({ signature: req.body.signature, date: req.body.date }, function(err, body, header) {
+        waivers.insert({ signature: req.body.signature, date: req.body.date, ip_address: req.ip }, function(err, body, header) {
           if (err) {
             console.log('[.insert] waivers error ', err.message);
           } else {
