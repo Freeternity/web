@@ -140,11 +140,11 @@ async function saveNewsToDb(newsArticles) {
 
 async function fetchNews() {
     console.log('Starting fetchNews');
-    const googleNews = await fetchGoogleNews();
-    const bingNews = await fetchBingNews();
+    //const googleNews = await fetchGoogleNews();
+    //const bingNews = await fetchBingNews();
     const rssNews = await fetchRssNews();
 
-    const allNews = [...googleNews, ...bingNews, ...rssNews];
+    const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
     console.log('Total news articles fetched:', allNews.length);
     await saveNewsToDb(allNews);
     console.log('Completed fetchNews');
