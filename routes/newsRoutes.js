@@ -14,12 +14,14 @@ router.get('/', (req, res) => {
     });
 });
 router.get('/news', (req, res) => {
+    console.log('GET /news route hit'); // Add this line for logging
     newsDb.list({ include_docs: true }, (err, body) => {
         if (err) {
             console.log('Error retrieving news:', err.message);
             return res.status(500).send({ error: 'Error retrieving news' });
         }
         const news = body.rows.map(row => row.doc);
+        console.log('News items:', news); // Add this line for logging
         res.render('news.html', { news });
     });
 });

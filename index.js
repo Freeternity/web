@@ -16,6 +16,8 @@ const userMiddleware = require('./middleware/userMiddleware');
 const sessionDebugMiddleware = require('./middleware/sessionDebugMiddleware');
 var cookieSession = require('cookie-session');
 
+const util = require('util');
+
 const app = express();
 
 //app.use(express.bodyParser());
@@ -196,8 +198,7 @@ var waivers = nano.use(settings.COUCHDB_PREFIX+'waivers');
 // list of news or text boxes on the cover page
 var news = nano.use(settings.COUCHDB_PREFIX+'news');
 var news_each = [];
-
-/* news.list(function(err, body) {
+/*news.list(function(err, body) {
   if (!err) {
     console.log('hi news loop')
     body.rows.forEach(function(doc) {
@@ -209,6 +210,32 @@ var news_each = [];
       console.log("error", err);
   }
 }); */
+
+function fetchNewsWithPagination(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    console.log(`Fetching news with skip: ${skip}, limit: ${limit}`); // Log the skip and limit values
+
+    news.list({ include_docs: true, skip: skip, limit: limit }, function(err, body) {
+        if (!err) {
+            console.log('hi news loop');
+            news_each = []; // Clear the array before adding new items
+            console.log(`Total news items fetched: ${body.rows.length}`); // Log the number of items fetched
+            body.rows.forEach(function(doc) {
+                news.get(doc.id, function(err, news_selected) {
+                    if (!err) {
+                        news_each.push(news_selected);
+                    } else {
+                        console.log("Error fetching news item:", err);
+                    }
+                });
+            });
+        } else {
+            console.log("Error listing news:", err);
+        }
+    });
+}
+// Example usage: Fetch the first page with 10 items per page
+fetchNewsWithPagination(1, 10);
 
 // Remove this block
 /*
@@ -235,7 +262,7 @@ function refreshNewsList() {
                 news.get(doc.id, function(err, news_selected) {
                     if (!err && !news_selected.pending) {
                         news_each.push(news_selected);
-                        console.log('News item added:', news_selected); // Log each news item
+                        //console.log('News item added:', news_selected); // Log each news item
                     }
                 });
             });
@@ -245,19 +272,88 @@ function refreshNewsList() {
     });
 }
 // Call refreshNewsList when the server starts
-refreshNewsList();
+//refreshNewsList();
+
+var newsDb = nano.db.use(settings.COUCHDB_PREFIX+'news');
+const viewAsync = util.promisify(newsDb.view).bind(newsDb);
+
+async function fetchNewsItems(skip, limit) {
+    try {
+        const body = await newsDb.find({
+            selector: {},
+            sort: [{ "_id": "desc" }],
+            skip: skip,
+            limit: limit
+        });
+        if (!body.docs) {
+            console.error('No documents found in fetchNewsItems');
+            return [];
+        } else {
+            console.log('News items fetched:', body.docs); // Add this line for logging
+        }
+        return body.docs;
+    } catch (error) {
+        console.error('Error in fetchNewsItems:', error);
+        throw error;
+    }
+}
+
+async function countNewsItems() {
+    try {
+        // Use a Mango query to count all documents
+        const body = await news.find({
+            selector: {}, // Empty selector to match all documents
+            fields: ["_id"] // Only fetch the _id field to reduce data transfer
+        });
+
+        if (!body.docs) {
+            console.error('No documents found in countNewsItems');
+            return 0;
+        } else {
+            console.log('News items fetched:', body.docs); // Add this line for logging
+            return body.docs.length;
+        }
+
+        console.log('Total news items:', body.docs.length); // Log the total number of documents
+        return body.docs.length;
+    } catch (error) {
+        console.error('Error in countNewsItems:', error);
+        throw error;
+    }
+}
+
 
 // Modify the /news route
-app.get('/news', (req, res) => {
-    refreshNewsList(); // Refresh the list before rendering
-    setTimeout(() => { // Wait a short time for the async operations to complete
+app.get('/news', async (req, res) => {
+    //refreshNewsList(); // Refresh the list before rendering
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    fetchNewsWithPagination(page, limit);
+
+    try {
+        const newsItems = await fetchNewsItems(skip, limit);
+        const totalItems = await countNewsItems();
+        console.log('Rendering news page:', { newsItems, currentPage: page, totalItems }); // Add this line for logging
+        const totalPages = Math.ceil(totalItems / limit);
+        console.log('Total pages:', totalPages); // Log the total number of pages
+        console.log('Rendering news page:', { newsItems, currentPage: page, totalPages }); // Add this line for logging
+
         res.render('news', {
             news_each: news_each,
             settings: settings,
             user: req.session.user,
-            session: req.session
+            session: req.session,
+            newsItems: newsItems,
+            currentPage: page,
+            totalPages: totalPages
         });
-    }, 1000); // Adjust this delay as needed
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 // Add this to your news update routes (POST and PUT)
@@ -371,7 +467,7 @@ app.post('/api/waiver/', (req, res) => {
     res.send({status: 'waived'});
 });
 
-app.get('/news', (req, res) => {
+/*app.get('/news', (req, res) => {
     refreshNewsList();
     res.render('news', {
         news_each: news_each,
@@ -380,7 +476,7 @@ app.get('/news', (req, res) => {
         request: req,
         user: req.session.user
     });
-});
+});*/
 
 app.get('/compare', (req, res) => {
     res.render('compare', {

@@ -221,7 +221,6 @@
         <br/><br/>
         
         {% for news_item in news_each %}
-            {% if news_item.url %}
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -232,29 +231,23 @@
                 </div>
                 <div class="modal-footer">
                     Published {{news_item.publishedAt}}
-                    <!--<button type="button" class="btn btn-info" data-dismiss="modal">Close</button>-->
                 </div>
             </div>
             <br/><br/>
-
-            {% else %}
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">{{ news_item.username_posting }} - {{ news_item.date_posted }}</h4>
-                </div>
-                <div class="row modal-body">
-                    <p>{{ news_item.msg }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-            <br/><br/>
-            {% endif %}
-
         {% endfor %}
+        
+        <p>Current Page: {{ currentPage }} | Total Pages: {{ totalPages }}</p>
+
+        <div class="pagination">
+            {% if currentPage > 1 %}
+                <a href="/news?page={{ currentPage - 1 }}" class="btn btn-default">Previous</a>
+            {% endif %}
+            {% if currentPage < totalPages %}
+                <a href="/news?page={{ currentPage + 1 }}" class="btn btn-default">Next</a>
+            {% endif %}
+        </div>
     </section>
+
 
     {% if settings.ALLOW_LOGIN %}
     <!-- Login or register Section -->

@@ -1,3 +1,5 @@
+.env
+./.env
 home/user/*
 home/user
 ./home/user
