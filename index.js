@@ -319,18 +319,10 @@ async function fetchNewsItems(skip, limit) {
 async function countNewsItems() {
     try {
         console.log('Attempting to count news items...');
-        const body = await newsDb.find({
-            selector: {},
-            fields: ["_id"]
-        });
-
-        if (!body.docs) {
-            console.error('No documents found in countNewsItems');
-            return 0;
-        } else {
-            console.log('Total news items:', body.docs.length);
-            return body.docs.length;
-        }
+        const body = await newsDb.info(); // Use the info method to get database information
+        const totalDocs = body.doc_count; // Get the total document count
+        console.log('Total news items:', totalDocs);
+        return totalDocs;
     } catch (error) {
         console.error('Error in countNewsItems:', error);
         throw error;
