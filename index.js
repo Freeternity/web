@@ -277,6 +277,24 @@ function refreshNewsList() {
 var newsDb = nano.db.use(settings.COUCHDB_PREFIX+'news');
 const viewAsync = util.promisify(newsDb.view).bind(newsDb);
 
+async function createIndex() {
+    try {
+        const response = await newsDb.createIndex({
+            index: {
+                fields: ['_id']
+            },
+            name: 'id-index',
+            type: 'json'
+        });
+        console.log('Index creation result:', response);
+    } catch (error) {
+        console.error('Error creating index:', error);
+    }
+}
+
+// Call the function to create the index
+createIndex();
+
 async function fetchNewsItems(skip, limit) {
     try {
         const body = await newsDb.find({
@@ -300,45 +318,56 @@ async function fetchNewsItems(skip, limit) {
 
 async function countNewsItems() {
     try {
-        // Use a Mango query to count all documents
-        const body = await news.find({
-            selector: {}, // Empty selector to match all documents
-            fields: ["_id"] // Only fetch the _id field to reduce data transfer
+        console.log('Attempting to count news items...');
+        const body = await newsDb.find({
+            selector: {},
+            fields: ["_id"]
         });
 
         if (!body.docs) {
             console.error('No documents found in countNewsItems');
             return 0;
         } else {
-            console.log('News items fetched:', body.docs); // Add this line for logging
+            console.log('Total news items:', body.docs.length);
             return body.docs.length;
         }
-
-        console.log('Total news items:', body.docs.length); // Log the total number of documents
-        return body.docs.length;
     } catch (error) {
         console.error('Error in countNewsItems:', error);
         throw error;
     }
 }
 
+async function calculateTotalPages(itemsPerPage) {
+    try {
+        const totalItems = await countNewsItems();
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        console.log('Total pages:', totalPages);
+        return totalPages;
+    } catch (error) {
+        console.error('Error in calculateTotalPages:', error);
+        throw error;
+    }
+}
+
+// Example usage
+const totalPages = 1;
+const itemsPerPage = 10; // Define how many items you want per page
+calculateTotalPages(itemsPerPage).then(totalPages => {
+    // Use totalPages in your application logic
+    totalPages = totalPages;
+});
 
 // Modify the /news route
 app.get('/news', async (req, res) => {
-    //refreshNewsList(); // Refresh the list before rendering
-
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    fetchNewsWithPagination(page, limit);
-
     try {
         const newsItems = await fetchNewsItems(skip, limit);
         const totalItems = await countNewsItems();
-        console.log('Rendering news page:', { newsItems, currentPage: page, totalItems }); // Add this line for logging
         const totalPages = Math.ceil(totalItems / limit);
-        console.log('Total pages:', totalPages); // Log the total number of pages
+
         console.log('Rendering news page:', { newsItems, currentPage: page, totalPages }); // Add this line for logging
 
         res.render('news', {
