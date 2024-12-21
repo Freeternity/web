@@ -119,18 +119,12 @@ async function saveNewsToDb(newsArticles) {
                         // not in the database, save it
                     console.log(result.docs); // Output the search results
             });
-            
-            
-            
-            
-            
-            
-            if (existing.docs && existing.docs.length === 0) {
+            /*if (existing.docs && existing.docs.length === 0) {
                 await newsDb.insert(newsDoc);
                 console.log('News article saved:', newsDoc.title);
             } else {
                 console.log('Duplicate article found, not saving:', newsDoc.title);
-            }
+            }*/
         } catch (error) {
             console.error('Error saving news article:', newsDoc.title, error);
         }
