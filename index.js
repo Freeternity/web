@@ -381,7 +381,9 @@ app.get('/news', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching news:', error);
-        res.status(500).send("Internal Server Error");
+        //res.status(500).send("Internal Server Error");
+        next(error); // Pass the error to the error handling middleware
+
     }
 });
 
@@ -520,6 +522,15 @@ app.get('/yivwiy.html', (req, res) => {
     res.render('exclusion', {
         settings: settings,
         waiver: false
+    });
+});
+
+app.use((err, req, res, next) => {
+    console.error('Error:', err.stack); // Log the error stack to the console
+    res.status(500).send({
+        error: 'Internal Server Error',
+        message: err.message,
+        stack: err.stack // Include the stack trace in the response
     });
 });
 
