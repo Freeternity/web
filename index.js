@@ -300,6 +300,7 @@ async function fetchNewsItems(skip, limit) {
         const body = await newsDb.find({
             selector: {},
             sort: [{ "_id": "desc" }],
+            descending: true,
             skip: skip,
             limit: limit
         });
