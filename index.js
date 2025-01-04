@@ -317,10 +317,10 @@ async function fetchNewsItems(skip, limit) {
     try {
         const body = await newsDb.find({
             selector: {},
-            sort: [{ "_id": "desc" }],
+            sort: [{ "timestamp": "desc" }],
             skip: skip,
             limit: limit,
-            use_index: 'id-index'
+            use_index: 'timestamp-index'
         });
         if (!body.docs) {
             console.error('No documents found in fetchNewsItems');
