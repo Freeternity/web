@@ -301,7 +301,8 @@ async function fetchNewsItems(skip, limit) {
             selector: {},
             sort: [{ "_id": "desc" }],
             skip: skip,
-            limit: limit
+            limit: limit,
+            use_index: 'id-index'
         });
         if (!body.docs) {
             console.error('No documents found in fetchNewsItems');
