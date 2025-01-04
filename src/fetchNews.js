@@ -138,8 +138,14 @@ async function fetchNews() {
     //const bingNews = await fetchBingNews();
     const rssNews = await fetchRssNews();
 
-    const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
-    console.log('Total news articles fetched:', allNews.length);
+    //const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
+    const allNews = rssNews.map(newsItem => ({
+        ...newsItem,
+        timestamp: new Date().toISOString() // Add current timestamp
+    }));
+    
+    console.log('Total news articles fetched:', allNews.length );
+    console.log('Completed fetchNews with timestamp');
     await saveNewsToDb(allNews);
     console.log('Completed fetchNews');
 }

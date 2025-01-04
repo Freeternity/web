@@ -277,6 +277,24 @@ function refreshNewsList() {
 var newsDb = nano.db.use(settings.COUCHDB_PREFIX+'news');
 const viewAsync = util.promisify(newsDb.view).bind(newsDb);
 
+async function createIndexTimestamp() {
+    try {
+        const response = await newsDb.createIndex({
+            index: {
+                fields: ['timestamp'] // Use a timestamp field for sorting
+            },
+            name: 'timestamp-index',
+            type: 'json'
+        });
+        console.log('Index creation result for Timestamp:', response);
+    } catch (error) {
+        console.error('Error creating index Timestamp:', error);
+    }
+}
+
+// Call the function to create the index
+createIndexTimestamp();
+
 async function createIndex() {
     try {
         const response = await newsDb.createIndex({
