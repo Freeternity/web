@@ -110,6 +110,12 @@
             loadNews();
         });
     </script>
+
+    <script>
+        $(document).ready(function() {
+            BaseHome.redirectToTotalPages();
+        });
+    </script>
 {% endblock %}
 
 {% block js %}
@@ -119,7 +125,7 @@
                 var totalPages = {{ totalPages }};
                 var currentPage = {{ currentPage }};
                 if (totalPages > 1 && currentPage == 1) {
-                    window.location.href = '/news?page=' + totalPages;
+                    window.location.href = '/news?page=' + (totalPages - 1);
                 }
             },
             logout: function() {
@@ -129,8 +135,6 @@
                 });
             }
         };
-
-        BaseHome.redirectToTotalPages();
 
         function handleLogin() {
             var username = document.getElementById('username').value;
