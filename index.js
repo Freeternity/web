@@ -235,7 +235,7 @@ function fetchNewsWithPagination(page = 1, limit = 10) {
     });
 }
 // Example usage: Fetch the first page with 10 items per page
-fetchNewsWithPagination(1, 10);
+//fetchNewsWithPagination(1, 10);
 
 // Remove this block
 /*
@@ -382,7 +382,7 @@ app.get('/news', async (req, res) => {
         console.log('Rendering news page:', { newsItems, currentPage: page, totalPages }); // Add this line for logging
 
         res.render('news', {
-            news_each: news_each,
+            //news_each: news_each,
             settings: settings,
             user: req.session.user,
             session: req.session,
