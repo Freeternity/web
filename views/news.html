@@ -115,7 +115,13 @@
 {% block js %}
     <script>
         var BaseHome = this.BaseHome = {
-
+            redirectToTotalPages: function() {
+                var totalPages = {{ totalPages }};
+                var currentPage = {{ currentPage }};
+                if (totalPages > 1 && currentPage == 1) {
+                    window.location.href = '/news?page=' + totalPages;
+                }
+            },
             logout: function() {
                 $.post("api/accounts/logout/", {}, function(response) {
                     alert(response.message || 'Logged out successfully');
@@ -123,6 +129,8 @@
                 });
             }
         };
+
+        BaseHome.redirectToTotalPages();
 
         function handleLogin() {
             var username = document.getElementById('username').value;
