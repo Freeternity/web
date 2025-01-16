@@ -316,11 +316,11 @@ createIndex();
 async function fetchNewsItems(skip, limit) {
     try {
         const body = await newsDb.find({
-            selector: { _id: { "$exists": true } },
-            sort: [{ "_id": "desc" }],
+            selector: { _id: { "$exists": true } }, //
+            sort: [{ "timestamp": "desc" }],
             skip: skip,
             limit: limit,
-            use_index: 'id-index'
+            use_index: 'timestamp-index'
         });
         if (!body.docs) {
             console.error('No documents found in fetchNewsItems');
