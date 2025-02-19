@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -99,7 +98,87 @@
                         window.location.href = uri;
                     }
             );
+        },
+        
+        handleLogin: function () {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('/api/accounts/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    switchToLogoutSection(username);
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    },
+
+    handleRegistration: function () {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        fetch('/api/accounts/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username: username, password: password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Registration success!');
+                switchToLogoutSection(username);
+            } else {
+                alert('Registration failed: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }, 
+
+    switchToLogoutSection: function (username) {
+        const loginSection = document.getElementById('login');
+        const logoutSection = document.getElementById('logout');
+
+        if (loginSection) {
+            loginSection.style.display = 'none';
         }
+
+        if (logoutSection) {
+            logoutSection.style.display = 'block';
+            document.querySelector('#logout h2').textContent = username;
+            $('#logout-section-username').text(username);
+        }
+    },
+
+    switchToLoginSection: function () {
+        const loginSection = document.getElementById('login');
+        const logoutSection = document.getElementById('logout');
+
+        if (loginSection) {
+            loginSection.style.display = 'block';
+        }
+
+        if (logoutSection) {
+            logoutSection.style.display = 'none';
+        }
+    }
     };
 
     </script>
@@ -166,19 +245,13 @@
                     
                     {% block navbar %}
 
-                        {% if not waiver %}
-
-                        {#
-                        <li>
-                            <a class="page-scroll" href="/compare">Compare providers</a>
-                        </li>
-                        #}
-
                         <li>
                             <a class="page-scroll" href="/news">News</a>
                         </li>
 
-                        {% endif %}
+                        <li>
+                            <a class="page-scroll" href="/apply">Apply</a>
+                        </li>
 
                         {% if user.is_authenticated %}
                             <li>
@@ -187,7 +260,7 @@
                         {% endif %}
 
 
-                        {% if sesssion.activated %}
+                        {% if session.activated %}
                         <li>
                             <a class="page-scroll modal-activate" onclick="return false;" data-toggle="#modal-upload" data-target="#modal-upload" href="#modal-upload"><i class="glyphicon glyphicon-headphones"></i> Activated</a>
                         </li>
@@ -256,15 +329,53 @@
     </header>
     {% endblock %}
 
-	{% block content %}
+    {% block lower_content %}   
+    {% endblock %}
 
+	{% block content %}
 	{% endblock %}
-	
+    
+    {% block precontent %}   
+    {% if settings.ALLOW_LOGIN %}
+    <!-- Login or register Section -->
+    <section id="login" class="container content-section text-center" style="display: {% if user %}none{% else %}block{% endif %};">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2>Login or Register</h2>
+                <p>
+                    <button data-toggle='#modal-login' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Login/register</button>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="logout-section" class="container content-section text-center" style="display: {% if user %}block{% else %}none{% endif %};">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <h2 id="logout-section-username">{{ user.username }}</h2>
+                <p>
+                    <button data-toggle='#modal-logout' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Logout</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+{% endblock %}
+
     <!-- Footer -->
     <footer>
         <div class="container text-center">
             <p style='font-size:.9em;'>
-                This site is not intended to replace professional medical advice, diagnosis, or treatment. Always consult your physician or a qualified healthcare provider before beginning any new treatment or making changes to your existing treatment plan. Do not ignore or delay seeking medical advice based on information from this site. The content on {{settings.NAME}} is not reviewed or approved by the Food and Drug Administration and should not be used to diagnose, treat, cure, or prevent any disease without a doctor's supervision. The views expressed on this site are those of the individual authors and do not necessarily reflect the opinions of the administrators, moderators, or editorial staff. Consequently, {{settings.NAME}} and its affiliates assume no responsibility for the content provided.                        
+                <br/><br/>
+                This site is not intended to replace professional medical advice, diagnosis, or treatment. 
+                Always consult your physician or a qualified healthcare provider before beginning any new treatment 
+                or making changes to your existing treatment plan. Do not ignore or delay seeking medical advice 
+                based on information from this site. The content on {{settings.NAME}} is not reviewed or approved 
+                by the Food and Drug Administration and should not be used to diagnose, treat, cure, or prevent 
+                any disease without a doctor's supervision. The views expressed on this site are those of the 
+                individual authors and do not necessarily reflect the opinions of the administrators, moderators, 
+                or editorial staff. Consequently, {{settings.NAME}} and its affiliates assume no responsibility for 
+                the content provided.  Use of this site is subject to our <a href="/waiver">Terms of Service</a>.                   
                 <br/>
                 <a href="mailto:{{settings.EMAIL}}">{{settings.EMAIL}}</a>
                 
@@ -280,6 +391,11 @@
             </p>
         </div>
     </footer>
+
+    {% block premodal %}
+        {% include "modals/modal_login.html" %}
+        {% include "modals/modal_logout.html" %}
+    {% endblock %}
 
     {% block modal %}
     <!-- modal -->

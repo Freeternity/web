@@ -1,6 +1,6 @@
 {% extends 'modals/modal.html' %}
 
-{% block modalid %}login-register{% endblock %}
+{% block modalid %}login{% endblock %}
 
 {% block modalcontent %}
 <div class="modal-dialog">
@@ -12,16 +12,22 @@
         <div class="modal-body">
             <form id="login-form" onsubmit="return false;">
                 <div class="form-group">
-                    <input type="text" id="username" class="form-control" placeholder="Username" required>
+                    <input type="text" id="username_modal" class="form-control" placeholder="Username" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="password" class="form-control" placeholder="Password" required>
+                    <input type="password" id="password_modal" class="form-control" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn btn-info" onclick="ModalLogin.login()">Login or Register</button>
+                <button type="submit" class="btn btn-info" onclick="ModalLogin.login_async()">Login or Register</button>
             </form>
+            {#
             <div class="social-login">
                 <button onclick="window.location.href='/auth/google'" class="btn btn-danger">Login with Google</button>
                 <button onclick="window.location.href='/auth/microsoft'" class="btn btn-primary">Login with Microsoft</button>
+            </div>
+            #}
+            <br/>
+            <div class="alert alert-warning" role="alert">
+                <b>Note:</b> If you don't have an account, you can register by entering an unregistered username and password.
             </div>
         </div>
     </div>
@@ -32,10 +38,93 @@
 <script>
     var ModalLogin = this.ModalLogin = {
         login_yes: false,
+        logout: function() {
+                $.post("api/accounts/logout/", {}, function(response) {
+                    alert(response.message || 'Logged out successfully');
+                    switchToLoginSection();
+                });
+            },
+            handleLogin: function () {
+                var username = document.getElementById('username_modal').value;
+                var password = document.getElementById('password_modal').value;
 
-        login: function() {
-            var username = $('#username').val();
-            var password = $('#password').val();
+                fetch('/api/accounts/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        switchToLogoutSection(username);
+                    } else {
+                        alert('Login failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            },
+
+            handleRegistration: function () {
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+
+                fetch('/api/accounts/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: username, password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Registration success!');
+                        switchToLogoutSection(username);
+                    } else {
+                        alert('Registration failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            },
+            switchToLogoutSection: function (username) {
+                const loginSection = document.getElementById('login');
+                const logoutSection = document.getElementById('logout');
+
+                if (loginSection) {
+                    loginSection.style.display = 'none';
+                }
+
+                if (logoutSection) {
+                    logoutSection.style.display = 'block';
+                    document.querySelector('#logout h2').textContent = username;
+                    $('#logout-section-username').text(username);
+                }
+            },
+
+            switchToLoginSection: function () {
+                const loginSection = document.getElementById('login');
+                const logoutSection = document.getElementById('logout');
+
+                if (loginSection) {
+                    loginSection.style.display = 'block';
+                }
+
+                if (logoutSection) {
+                    logoutSection.style.display = 'none';
+                }
+            },
+            login_async: function() {
+            var username = $('#username_modal').val();
+            var password = $('#password_modal').val();
 
             var login_async = function () {
                 $.ajax("/api/accounts/login/", {

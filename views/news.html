@@ -113,117 +113,29 @@
 
     <script>
         $(document).ready(function() {
-            BaseHome.redirectToTotalPages();
+            News.redirectToTotalPages();
         });
     </script>
 {% endblock %}
 
 {% block js %}
     <script>
-        var BaseHome = this.BaseHome = {
+        var News = this.News = {
             redirectToTotalPages: function() {
                 var totalPages = {{ totalPages }};
                 var currentPage = {{ currentPage }};
                 if (totalPages > 1 && currentPage == 1) {
                     //window.location.href = '/news?page=' + (totalPages - 1);
                 }
-            },
-            logout: function() {
-                $.post("api/accounts/logout/", {}, function(response) {
-                    alert(response.message || 'Logged out successfully');
-                    switchToLoginSection();
-                });
             }
+            
+
         };
-
-        function handleLogin() {
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-
-            fetch('/api/accounts/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username: username, password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    switchToLogoutSection(username);
-                } else {
-                    alert('Login failed: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        }
-
-        function handleRegistration() {
-            var username = document.getElementById('username').value;
-            var password = document.getElementById('password').value;
-
-            fetch('/api/accounts/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username: username, password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Registration success!');
-                    switchToLogoutSection(username);
-                } else {
-                    alert('Registration failed: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        }
-        function switchToLogoutSection(username) {
-            const loginSection = document.getElementById('login');
-            const logoutSection = document.getElementById('logout');
-
-            if (loginSection) {
-                loginSection.style.display = 'none';
-            }
-
-            if (logoutSection) {
-                logoutSection.style.display = 'block';
-                document.querySelector('#logout h2').textContent = username;
-                $('#logout-section-username').text(username);
-            }
-        }
-
-        function switchToLoginSection() {
-            const loginSection = document.getElementById('login');
-            const logoutSection = document.getElementById('logout');
-
-            if (loginSection) {
-                loginSection.style.display = 'block';
-            }
-
-            if (logoutSection) {
-                logoutSection.style.display = 'none';
-            }
-        }
     </script>
 {% endblock %}
 
-{% block header_msg %}
-    <h1 class="mb-5">Longevity more accessible</h1>
-    <p>
-        The greatest eternity is the eternity of love. Doing kindnesses and spreading goodnesses throughout this wonder-filled world we call Earth. And helping those who are weak or ill. Love only.
-    </p>
-    <button type="button" class="btn btn-default" data-dismiss="modal" style="background: #fff;">Spread Eternity ❤</button>
-{% endblock %}
+
+ 
 
 {% block content %}
 
@@ -260,32 +172,6 @@
         </div>
     </section>
 
-
-    {% if settings.ALLOW_LOGIN %}
-    <!-- Login or register Section -->
-    <section id="login" class="container content-section text-center" style="display: {% if user %}none{% else %}block{% endif %};">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2>Login or Register</h2>
-                <p>
-                    <button data-toggle='#modal-login-register' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Login/register</button>
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section id="logout-section" class="container content-section text-center" style="display: {% if user %}block{% else %}none{% endif %};">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
-                <h2 id="logout-section-username">{{ user.username }}</h2>
-                <p>
-                    <button data-toggle='#modal-logout' class="btn btn-default modal-activate"><i class="glyphicon glyphicon-user"></i> Logout</button>
-                </p>
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
     <!-- Contact Section -->
     <section id="contact" class="container content-section text-center">
         <div class="row">
@@ -298,8 +184,8 @@
 {% endblock %}
 
 {% block modal %}
-    {% include "modals/modal_login.html" %}
+    
     {% include "modals/modal_record.html" %}
     {% include "modals/modal_news.html" %}
-    {% include "modals/modal_logout.html" %}
+    
 {% endblock %}

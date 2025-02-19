@@ -168,14 +168,12 @@ app.post('/admin/login', adminAuth, (req, res) => {
 });
 
 const requireLogin = require('./middleware/requireLogin');
-
 const adminRoutes = require('./routes/adminRoutes');
-
-
+const applyRoutes = require('./routes/applyRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const { request } = require('http');
 app.use('/api/news', newsRoutes);
-
+app.use('/api/apply', applyRoutes);
 // Other configurations and middleware
 
 app.use('/admin', requireLogin, adminRoutes);
@@ -398,6 +396,24 @@ app.get('/news', async (req, res) => {
     }
 });
 
+app.get('/apply', async (req, res) => {
+    try {
+        
+        res.render('apply', {
+            //news_each: news_each,
+            settings: settings,
+            user: req.session.user,
+            session: req.session
+            
+        });
+    } catch (error) {
+        console.error('Error fetching apply page:', error);
+        //res.status(500).send("Internal Server Error");
+        next(error); // Pass the error to the error handling middleware
+    }
+});
+
+
 // Add this to your news update routes (POST and PUT)
 app.post('/api/news', (req, res) => {
     // Your existing code here
@@ -494,8 +510,14 @@ app.post('/api/accounts/register', (req, res) => {
 });
 app.get('/', (req, res) => {
     console.log('Hello, ' + (req.user.is_authenticated ? 'authenticated user' : 'guest'));
+    //res.render('waiver', {settings: settings, waiver: true, res: res});
+    res.redirect('/news');
+});
+
+app.get('/waiver', (req, res) => {
     res.render('waiver', {settings: settings, waiver: true, res: res});
 });
+
 
 app.post('/api/waiver/', (req, res) => {
     console.log('/api/waiver/: ' + req.body.signature);
