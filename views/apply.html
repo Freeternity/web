@@ -1,0 +1,118 @@
+{% extends 'index.html' %}
+
+{% block css %}
+    <style>
+        .actions { margin-top: 10px; }
+    </style>
+
+    <style>
+
+        section#shiurs .list-group-item {
+            text-align: left;
+        }
+
+        section#news .modal-body p {
+            text-align: left;
+            padding: 18px;
+        }
+
+        .form-login .input-group-addon {
+            display:none;
+        }
+
+        @media(min-width:467px) {
+            .form-login .input-group-addon {
+                display:inline;
+            }
+        }
+
+        /* iframe */
+        @media(min-width:218px) {
+
+        }
+
+        @media(min-width:388px) {
+
+        }
+    </style>
+{% endblock %}
+
+{% block js %}
+
+    <script>
+    var Apply = this.Apply = {
+        submitApplication: function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const socialSecurityNumber = document.getElementById('social_security_number').value;
+    
+            const data = {
+                username: username,
+                password: password,
+                email: email,
+                social_security_number: socialSecurityNumber
+            };
+    
+            // Send data to internal API
+            fetch('/api/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Internal API response:', data);
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert('Application submitted successfully!');
+                }
+            })
+            .catch(error => {
+                console.error('Error with internal API:', error);
+            });
+    
+            // Send data to external HTTPS endpoint
+            
+    }
+    };
+     </script>
+    
+
+{% endblock %}
+
+
+
+{% block header_msg %}
+
+<h1 class="mb-5">Longevity Application</h1>
+<p>
+    Apply for longevity benefits with a simple form below.  We believe
+    in spreading Free Eternity to the whole world; that is why we are called
+    Freeternity.
+</p>
+<div class="formApply">
+    <div class="form-group">
+        <input type="text" class="form-control form-login" id="username" placeholder="Username">
+    </div>
+    <div class="form-group">
+        <input type="password" class="form-control form-login" id="password" placeholder="Password">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-login" id="email" placeholder="Email Address">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-login" id="social_security_number" placeholder="Social Security Number">
+    </div>
+    <button onclick="Apply.submitApplication(); return false;" type="button" class="btn btn-default" data-dismiss="modal" style="background: #fff;">Submit Application ❤</button>
+    <br/><br/>
+    <div class="alert alert-warning" role="alert">
+        <b>Note:</b> If you don't have an account, you can register by entering an unregistered username and password.
+    </div>
+</div>
+
+{% endblock %}
+
