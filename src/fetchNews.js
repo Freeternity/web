@@ -158,11 +158,12 @@ async function saveNewsToDb(newsArticles) {
     console.log('Starting saveNewsToDb with', newsArticles.length, 'articles');
 
     try {
-        // Fetch all existing titles from the database
+        // Fetch existing titles from the database, sorted by _id in descending order
         const existingArticles = await newsDb.find({
             selector: {},
             fields: ['title'],
-            limit: 100000 // Adjust the limit based on your database size
+            sort: [{ '_id': 'desc' }], // Sort by _id in descending order
+            limit: 1000 // Limit to the most recent 1000 articles
         });
 
         // Create a set of existing titles for quick lookup
@@ -202,7 +203,6 @@ async function saveNewsToDb(newsArticles) {
         console.error('Error fetching existing articles:', error);
     }
 }
-
 
 async function fetchNews() {
     console.log('Starting fetchNews');
