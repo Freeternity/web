@@ -45,6 +45,16 @@ async function createIndexes() {
         });
         console.log('Timestamp index creation result:', timestampIndexResponse);
 
+        // Create an index on the '_id' field
+        const idIndexResponse = await newsDb.createIndex({
+            index: {
+                fields: ['_id']
+            },
+            name: 'id-index',
+            type: 'json'
+        });
+        console.log('ID index creation result:', idIndexResponse);
+
     } catch (error) {
         console.error('Error creating indexes:', error);
     }
