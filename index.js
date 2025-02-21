@@ -367,32 +367,36 @@ calculateTotalPages(itemsPerPage).then(totalPages => {
 });
 
 // Modify the /news route
-app.get('/news', async (req, res) => {
+app.get('/news', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
     try {
-        const newsItems = await fetchNewsItems(skip, limit);
-        const totalItems = await countNewsItems();
+        // Fetch news items sorted by _id in descending order
+        const newsItems = await newsDb.find({
+            selector: {},
+            sort: [{ '_id': 'desc' }], // Sort by _id in descending order
+            limit: limit,
+            skip: skip
+        });
+
+        const totalItems = await newsDb.info().then(info => info.doc_count);
         const totalPages = Math.ceil(totalItems / limit);
 
-        console.log('Rendering news page:', { newsItems, currentPage: page, totalPages }); // Add this line for logging
+        console.log('Rendering news page:', { newsItems: newsItems.docs, currentPage: page, totalPages }); // Add this line for logging
 
         res.render('news', {
-            //news_each: news_each,
             settings: settings,
             user: req.session.user,
             session: req.session,
-            newsItems: newsItems,
+            newsItems: newsItems.docs,
             currentPage: page,
             totalPages: totalPages
         });
     } catch (error) {
         console.error('Error fetching news:', error);
-        //res.status(500).send("Internal Server Error");
         next(error); // Pass the error to the error handling middleware
-
     }
 });
 
