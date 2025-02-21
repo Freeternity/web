@@ -59,8 +59,16 @@ async function fetchRssNews() {
     const url = 'https://news.google.com/news?q=long life&output=rss&num=25';
     console.log('Fetching RSS news from:', url);
 
+    const timeout = 10000; // Set timeout to 10 seconds
+
     try {
-        const feed = await parser.parseURL(url);
+        const fetchPromise = parser.parseURL(url);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('RSS fetch timed out')), timeout)
+        );
+
+        const feed = await Promise.race([fetchPromise, timeoutPromise]);
+        console.log('Fetched RSS feed', feed);
         console.log('Fetched RSS News articles:', feed.items.length);
         return feed.items.map(item => ({
             title: item.title,
