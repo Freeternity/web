@@ -76,6 +76,7 @@ async function fetchRssNews() {
             url: item.link,
             source: item.source || '',
             publishedAt: item.pubDate,
+            timestamp: new Date().toISOString(),
             pending: false
         }));
     } catch (error) {
@@ -129,6 +130,7 @@ function parseBingNewsHTML(html) {
             sourceText,
             faviconImg,
             publishedAt: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
             pending: false
         });
     });
@@ -183,6 +185,7 @@ async function saveNewsToDb(newsArticles) {
                     sourceText: article.sourceText,
                     faviconImg: article.faviconImg,
                     publishedAt: article.publishedAt,
+                    timestamp: new Date().toISOString(),
                     pending: false
                 };
 

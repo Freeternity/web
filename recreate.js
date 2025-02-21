@@ -20,3 +20,34 @@ databases.forEach(dbName => {
         }
     });
 });
+
+const newsDb = nano.db.use('freeternity_news');
+
+async function createIndexes() {
+    try {
+        // Create an index on the 'title' field
+        const titleIndexResponse = await newsDb.createIndex({
+            index: {
+                fields: ['title']
+            },
+            name: 'title-index',
+            type: 'json'
+        });
+        console.log('Title index creation result:', titleIndexResponse);
+
+        // Create an index on the 'timestamp' field
+        const timestampIndexResponse = await newsDb.createIndex({
+            index: {
+                fields: ['timestamp']
+            },
+            name: 'timestamp-index',
+            type: 'json'
+        });
+        console.log('Timestamp index creation result:', timestampIndexResponse);
+
+    } catch (error) {
+        console.error('Error creating indexes:', error);
+    }
+}
+
+createIndexes();
