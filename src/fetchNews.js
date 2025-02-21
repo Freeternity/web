@@ -136,49 +136,73 @@ function parseBingNewsHTML(html) {
     return articles;
 }
 
+async function createTitleIndex() {
+    try {
+        const response = await newsDb.createIndex({
+            index: {
+                fields: ['title']
+            },
+            name: 'title-index',
+            type: 'json'
+        });
+        console.log('Title index creation result:', response);
+    } catch (error) {
+        console.error('Error creating title index (may already exist):', error);
+    }
+}
+
+// Call the function to ensure the title index is created
+createTitleIndex();
 
 async function saveNewsToDb(newsArticles) {
     console.log('Starting saveNewsToDb with', newsArticles.length, 'articles');
 
-    const savePromises = newsArticles.map(async (article) => {
-        const newsDoc = {
-            title: article.title,
-            description: article.description,
-            url: article.url,
-            source: article.source,
-            img: article.img, // Add image field
-            sourceImage: article.sourceImage, // Add source image field
-            sourceText: article.sourceText, // Add source text field
-            faviconImg: article.faviconImg, // Add favicon image field
-            publishedAt: article.publishedAt,
-            pending: false
-        };
+    try {
+        // Fetch all existing titles from the database
+        const existingArticles = await newsDb.find({
+            selector: {},
+            fields: ['title'],
+            limit: 100000 // Adjust the limit based on your database size
+        });
 
-        try {
-            // Check if the article already exists in the database
-            const existing = await newsDb.find({
-                selector: {
-                    title: {
-                        "$regex": article.title
-                    }
-                },
-                limit: 10
-            });
+        // Create a set of existing titles for quick lookup
+        const existingTitles = new Set(existingArticles.docs.map(doc => doc.title.toLowerCase().trim()));
 
-            if (existing.docs.length === 0) {
-                await newsDb.insert(newsDoc);
-                console.log('News article saved:', newsDoc.title, newsDoc.url);
+        const savePromises = newsArticles.map(async (article) => {
+            const normalizedTitle = article.title.toLowerCase().trim();
+
+            if (!existingTitles.has(normalizedTitle)) {
+                const newsDoc = {
+                    title: article.title,
+                    description: article.description,
+                    url: article.url,
+                    source: article.source,
+                    img: article.img,
+                    sourceImage: article.sourceImage,
+                    sourceText: article.sourceText,
+                    faviconImg: article.faviconImg,
+                    publishedAt: article.publishedAt,
+                    pending: false
+                };
+
+                try {
+                    await newsDb.insert(newsDoc);
+                    console.log('News article saved:', newsDoc.title, newsDoc.url);
+                } catch (error) {
+                    console.error('Error saving news article:', newsDoc.title, error);
+                }
             } else {
                 console.log('Not inserting in the database because it already exists there.');
             }
-        } catch (error) {
-            console.error('Error saving news article:', newsDoc.title, error);
-        }
-    });
+        });
 
-    await Promise.all(savePromises);
-    console.log('Completed saveNewsToDb');
+        await Promise.all(savePromises);
+        console.log('Completed saveNewsToDb');
+    } catch (error) {
+        console.error('Error fetching existing articles:', error);
+    }
 }
+
 
 async function fetchNews() {
     console.log('Starting fetchNews');
