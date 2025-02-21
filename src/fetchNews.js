@@ -139,7 +139,8 @@ function parseBingNewsHTML(html) {
 
 async function saveNewsToDb(newsArticles) {
     console.log('Starting saveNewsToDb with', newsArticles.length, 'articles');
-    for (const article of newsArticles) {
+
+    const savePromises = newsArticles.map(async (article) => {
         const newsDoc = {
             title: article.title,
             description: article.description,
@@ -162,19 +163,20 @@ async function saveNewsToDb(newsArticles) {
                     }
                 },
                 limit: 10
-            });            
-            
+            });
+
             if (existing.docs.length === 0) {
-                newsDb.insert(newsDoc);
+                await newsDb.insert(newsDoc);
                 console.log('News article saved:', newsDoc.title, newsDoc.url);
             } else {
                 console.log('Not inserting in the database because it already exists there.');
             }
-        
         } catch (error) {
             console.error('Error saving news article:', newsDoc.title, error);
         }
-    }
+    });
+
+    await Promise.all(savePromises);
     console.log('Completed saveNewsToDb');
 }
 
