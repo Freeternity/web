@@ -76,6 +76,59 @@ async function fetchRssNews() {
     }
 }
 
+async function fetchBingNewsWithImages() {
+    const fetch = (await import('node-fetch')).default; // Use dynamic import
+    console.log('Starting fetchBingNewsWithImages');
+    const url = 'https://www.bing.com/news/search?q=longevity&qft=interval%3d%227%22&form=PTFTNR';
+    console.log('Bing News URL:', url);
+
+    try {
+        const response = await fetch(url);
+        console.log('Bing News response status:', response.status);
+        const html = await response.text();
+
+        // Parse the HTML to extract news articles
+        const articles = parseBingNewsHTML(html);
+        console.log('Fetched Bing News articles with images:', articles.length);
+        return articles;
+    } catch (error) {
+        console.error('Error fetching Bing News with images:', error);
+        return [];
+    }
+}
+
+function parseBingNewsHTML(html) {
+    const articles = [];
+    // Use a library like cheerio to parse the HTML and extract the necessary details
+    const cheerio = require('cheerio');
+    const $ = cheerio.load(html);
+
+    $('.news-card').each((index, element) => {
+        const title = $(element).find('.title').text();
+        const description = $(element).find('.snippet').text();
+        const url = $(element).find('a.title').attr('href');
+        const img = $(element).find('img.image').attr('src');
+        const sourceImage = $(element).find('img.source').attr('src');
+        const sourceText = $(element).find('.source').text();
+        const faviconImg = $(element).find('img.favicon').attr('src');
+
+        articles.push({
+            title,
+            description,
+            url,
+            img,
+            sourceImage,
+            sourceText,
+            faviconImg,
+            publishedAt: new Date().toISOString(),
+            pending: false
+        });
+    });
+
+    return articles;
+}
+
+
 async function saveNewsToDb(newsArticles) {
     console.log('Starting saveNewsToDb with', newsArticles.length, 'articles');
     for (const article of newsArticles) {
@@ -84,47 +137,32 @@ async function saveNewsToDb(newsArticles) {
             description: article.description,
             url: article.url,
             source: article.source,
+            img: article.img, // Add image field
+            sourceImage: article.sourceImage, // Add source image field
+            sourceText: article.sourceText, // Add source text field
+            faviconImg: article.faviconImg, // Add favicon image field
             publishedAt: article.publishedAt,
             pending: false
         };
 
         try {
             // Check if the article already exists in the database
-            const existing = await newsDb.find({ selector: { url: article.url } });
-            //console.log(existing);
-            //console.log('Existing articles:', existing.docs.length);
-            
-            //new method for searching for existing artices:
-            newsDb.find({
+            const existing = await newsDb.find({
                 selector: {
-                    // Your search criteria here
-                    "url": {
-                        "$regex": article.url // Example: search for documents where 'field_name' contains 'search_term'
+                    title: {
+                        "$regex": article.title
                     }
                 },
-                limit: 10 // Limit the number of results
-                }, (err, result) => {
-                    if (err) {
-                        console.error(err);
-                    }
-                    if (result && result.docs && result.docs.length === 0) {
-
-                        newsDb.insert(newsDoc);
-                        console.log('News article saved:', newsDoc.title);
-
-                    } else {
-
-                        console.log('not inserting in the database because it already exists there.');
-                    }
-                        // not in the database, save it
-                    console.log(result.docs); // Output the search results
-            });
-            /*if (existing.docs && existing.docs.length === 0) {
-                await newsDb.insert(newsDoc);
-                console.log('News article saved:', newsDoc.title);
+                limit: 10
+            });            
+            
+            if (existing.docs.length === 0) {
+                newsDb.insert(newsDoc);
+                console.log('News article saved:', newsDoc.title, newsDoc.url);
             } else {
-                console.log('Duplicate article found, not saving:', newsDoc.title);
-            }*/
+                console.log('Not inserting in the database because it already exists there.');
+            }
+        
         } catch (error) {
             console.error('Error saving news article:', newsDoc.title, error);
         }
@@ -136,10 +174,11 @@ async function fetchNews() {
     console.log('Starting fetchNews');
     //const googleNews = await fetchGoogleNews();
     //const bingNews = await fetchBingNews();
+    const bingNewsWithImages = await fetchBingNewsWithImages();
     const rssNews = await fetchRssNews();
 
     //const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
-    const allNews = rssNews.map(newsItem => ({
+    const allNews = [ ...bingNewsWithImages, ...rssNews].map(newsItem => ({
         ...newsItem,
         timestamp: new Date().toISOString() // Add current timestamp
     }));
