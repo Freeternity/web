@@ -56,7 +56,7 @@ async function fetchBingNews() {
 
 async function fetchRssNews() {
     const parser = new Parser();
-    const url = 'https://news.google.com/news?q=long life&output=rss&num=25';
+    const url = 'https://news.google.com/news?q=longevity&output=rss&num=25';
     console.log('Fetching RSS news from:', url);
 
     const timeout = 10000; // Set timeout to 10 seconds
