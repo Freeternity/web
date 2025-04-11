@@ -56,7 +56,7 @@ async function fetchBingNews() {
 
 async function fetchRssNews() {
     const parser = new Parser();
-    const url = 'https://news.google.com/news?q=longevity&output=rss&num=25';
+    const url = 'https://news.google.com/news?q=longevity health&output=rss&num=25';
     console.log('Fetching RSS news from:', url);
 
     const timeout = 10000; // Set timeout to 10 seconds
@@ -88,7 +88,7 @@ async function fetchRssNews() {
 async function fetchBingNewsWithImages() {
     const fetch = (await import('node-fetch')).default; // Use dynamic import
     console.log('Starting fetchBingNewsWithImages');
-    const url = 'https://www.bing.com/news/search?q=longevity&qft=interval%3d%227%22&form=PTFTNR';
+    const url = 'https://www.bing.com/news/search?q=longevity health&qft=interval%3d%227%22&form=PTFTNR';
     console.log('Bing News URL:', url);
 
     try {
