@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const { newsDb } = require('../dbConfig'); // Adjust the path as necessary
 
+function parseNewsTimestamp(doc) {
+    const candidates = [
+        doc && doc.normalized_timestamp,
+        doc && doc.timestamp,
+        doc && doc.publishedAt,
+    ];
+    for (const value of candidates) {
+        if (!value) continue;
+        const ms = new Date(value).getTime();
+        if (!Number.isNaN(ms)) return ms;
+    }
+    return 0;
+}
+
+function sortNewsByNovelty(news) {
+    return news.sort((a, b) => {
+        const tb = parseNewsTimestamp(b);
+        const ta = parseNewsTimestamp(a);
+        if (tb !== ta) return tb - ta;
+        return String(b?._id || '').localeCompare(String(a?._id || ''));
+    });
+}
+
 // Get all news
 router.get('/', (req, res) => {
     newsDb.list({ include_docs: true }, (err, body) => {
@@ -9,7 +32,7 @@ router.get('/', (req, res) => {
             console.log('Error retrieving news:', err.message);
             return res.status(500).send({ error: 'Error retrieving news' });
         }
-        const news = body.rows.map(row => row.doc);
+        const news = sortNewsByNovelty(body.rows.map(row => row.doc));
         res.send(news);
     });
 });
@@ -20,7 +43,7 @@ router.get('/news', (req, res) => {
             console.log('Error retrieving news:', err.message);
             return res.status(500).send({ error: 'Error retrieving news' });
         }
-        const news = body.rows.map(row => row.doc);
+        const news = sortNewsByNovelty(body.rows.map(row => row.doc));
         console.log('News items:', news); // Add this line for logging
         res.render('news.html', { news });
     });

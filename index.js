@@ -333,6 +333,20 @@ async function fetchNewsItems(skip, limit) {
     }
 }
 
+function parseNewsTimestamp(doc) {
+    const candidates = [
+        doc && doc.normalized_timestamp,
+        doc && doc.timestamp,
+        doc && doc.publishedAt,
+    ];
+    for (const value of candidates) {
+        if (!value) continue;
+        const ms = new Date(value).getTime();
+        if (!Number.isNaN(ms)) return ms;
+    }
+    return 0;
+}
+
 async function countNewsItems() {
     try {
         console.log('Attempting to count news items...');
@@ -373,24 +387,31 @@ app.get('/news', async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     try {
-        // Fetch news items sorted by _id in descending order
-        const newsItems = await newsDb.find({
-            selector: {},
-            sort: [{ '_id': 'desc' }], // Sort by _id in descending order
-            limit: limit,
-            skip: skip
+        // Fetch a larger set then sort by novelty timestamp in-app.
+        // (CouchDB has mixed legacy timestamp formats, so this is safest.)
+        const rawNews = await newsDb.find({
+            selector: { _id: { "$exists": true } },
+            limit: 5000
         });
+
+        const sortedDocs = (rawNews.docs || []).sort((a, b) => {
+            const tb = parseNewsTimestamp(b);
+            const ta = parseNewsTimestamp(a);
+            if (tb !== ta) return tb - ta;
+            return String(b._id || '').localeCompare(String(a._id || ''));
+        });
+        const pagedDocs = sortedDocs.slice(skip, skip + limit);
 
         const totalItems = await newsDb.info().then(info => info.doc_count);
         const totalPages = Math.ceil(totalItems / limit);
 
-        console.log('Rendering news page:', { newsItems: newsItems.docs, currentPage: page, totalPages }); // Add this line for logging
+        console.log('Rendering news page:', { newsItems: pagedDocs, currentPage: page, totalPages }); // Add this line for logging
 
         res.render('news', {
             settings: settings,
             user: req.session.user,
             session: req.session,
-            newsItems: newsItems.docs,
+            newsItems: pagedDocs,
             currentPage: page,
             totalPages: totalPages
         });

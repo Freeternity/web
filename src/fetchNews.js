@@ -186,6 +186,7 @@ async function saveNewsToDb(newsArticles) {
                     faviconImg: article.faviconImg,
                     publishedAt: article.publishedAt,
                     timestamp: new Date().toISOString(),
+                    normalized_timestamp: new Date().toISOString(),
                     pending: false
                 };
 
@@ -217,7 +218,8 @@ async function fetchNews() {
     //const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
     const allNews = [ ...bingNewsWithImages, ...rssNews].map(newsItem => ({
         ...newsItem,
-        timestamp: new Date().toISOString() // Add current timestamp
+        timestamp: new Date().toISOString(), // Add current timestamp
+        normalized_timestamp: new Date().toISOString()
     }));
     
     console.log('Total news articles fetched:', allNews.length );
