@@ -11,10 +11,10 @@ function parsePorts() {
       .filter(n => Number.isFinite(n) && n > 0);
   }
 
-  const start = parseInt(process.env.WEB_PORT_START || '3000', 10);
+  const start = parseInt(process.env.WEB_PORT_START || '3001', 10);
   const count = parseInt(process.env.WEB_PORT_COUNT || '1', 10);
   const safeCount = Number.isFinite(count) && count > 0 ? count : 1;
-  const safeStart = Number.isFinite(start) && start > 0 ? start : 3000;
+  const safeStart = Number.isFinite(start) && start > 0 ? start : 3001;
 
   const ports = [];
   for (let i = 0; i < safeCount; i += 1) {
