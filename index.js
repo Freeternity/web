@@ -153,7 +153,9 @@ settings.DOMAIN = 'localhost';
 settings.EMAIL = 'longevity@freeternity.com'
 settings.COUCHDB_PREFIX = 'freeternity_';
 settings.LOCAL = false;
-settings.PORT = 3000;
+// Allow overriding PORT via env so we can run multiple instances (port-based balancing).
+const parsedEnvPort = parseInt(process.env.PORT || '', 10);
+settings.PORT = Number.isFinite(parsedEnvPort) && parsedEnvPort > 0 ? parsedEnvPort : 3000;
 settings.NAME = 'Freeternity';
 settings.FAKE_INSERT = false;
 module.exports = settings;
@@ -372,13 +374,18 @@ async function calculateTotalPages(itemsPerPage) {
     }
 }
 
-// Example usage
-const totalPages = 1;
+// Example startup calculation (diagnostic only)
+let startupTotalPages = 1;
 const itemsPerPage = 10; // Define how many items you want per page
-calculateTotalPages(itemsPerPage).then(totalPages => {
-    // Use totalPages in your application logic
-    totalPages = totalPages;
-});
+calculateTotalPages(itemsPerPage)
+    .then(tp => {
+        startupTotalPages = tp;
+        console.log('Startup total pages:', startupTotalPages);
+    })
+    .catch(err => {
+        // Keep the web process alive even if CouchDB is temporarily unavailable.
+        console.error('Startup total-pages calculation failed:', err && err.message ? err.message : err);
+    });
 
 // Modify the /news route
 app.get('/news', async (req, res, next) => {

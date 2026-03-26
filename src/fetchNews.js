@@ -1,6 +1,7 @@
 require('dotenv').config();
 const nano = require('nano')('http://'+process.env.admin_username+':'+process.env.admin_password+'@localhost:5984');
-const newsDb = nano.db.use('freeternity_news');
+const settings = require('../settings.js');
+const newsDb = nano.db.use(settings.COUCHDB_PREFIX + 'news');
 const Parser = require('rss-parser');
 
 const GOOGLE_NEWS_API_KEY = process.env.GOOGLE_NEWS_API_KEY;
@@ -13,6 +14,7 @@ const keywords = [
     'blue zones',
     'longevity supplements'
 ];
+let isFetchRunning = false;
 
 async function fetchGoogleNews() {
     const fetch = (await import('node-fetch')).default; // Use dynamic import
@@ -160,18 +162,23 @@ async function saveNewsToDb(newsArticles) {
     console.log('Starting saveNewsToDb with', newsArticles.length, 'articles');
 
     try {
-        // Fetch existing titles from the database, sorted by _id in descending order
-        const existingArticles = await newsDb.find({
-            selector: {},
-            fields: ['title'],
-            sort: [{ '_id': 'desc' }], // Sort by _id in descending order
-            limit: 1000 // Limit to the most recent 1000 articles
+        // Use _all_docs (list) instead of Mango _find to avoid CouchDB timeout pressure.
+        const existingArticles = await newsDb.list({
+            include_docs: true,
+            descending: true,
+            limit: 2000
         });
 
         // Create a set of existing titles for quick lookup
-        const existingTitles = new Set(existingArticles.docs.map(doc => doc.title.toLowerCase().trim()));
+        const existingTitles = new Set(
+            (existingArticles.rows || [])
+                .map(row => row.doc)
+                .filter(doc => doc && doc.title)
+                .map(doc => doc.title.toLowerCase().trim())
+        );
 
         const savePromises = newsArticles.map(async (article) => {
+            if (!article || !article.title) return;
             const normalizedTitle = article.title.toLowerCase().trim();
 
             if (!existingTitles.has(normalizedTitle)) {
@@ -209,23 +216,35 @@ async function saveNewsToDb(newsArticles) {
 }
 
 async function fetchNews() {
+    if (isFetchRunning) {
+        console.log('fetchNews is already running; skipping this cycle.');
+        return;
+    }
+    isFetchRunning = true;
     console.log('Starting fetchNews');
-    //const googleNews = await fetchGoogleNews();
-    //const bingNews = await fetchBingNews();
-    const bingNewsWithImages = await fetchBingNewsWithImages();
-    const rssNews = await fetchRssNews();
+    try {
+        //const googleNews = await fetchGoogleNews();
+        //const bingNews = await fetchBingNews();
+        const bingNewsWithImages = await fetchBingNewsWithImages();
+        const rssNews = await fetchRssNews();
 
-    //const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
-    const allNews = [ ...bingNewsWithImages, ...rssNews].map(newsItem => ({
-        ...newsItem,
-        timestamp: new Date().toISOString(), // Add current timestamp
-        normalized_timestamp: new Date().toISOString()
-    }));
-    
-    console.log('Total news articles fetched:', allNews.length );
-    console.log('Completed fetchNews with timestamp');
-    await saveNewsToDb(allNews);
-    console.log('Completed fetchNews');
+        //const allNews = [...rssNews]; //just fetch rss news - ...googleNews, ...bingNews,
+        const nowIso = new Date().toISOString();
+        const allNews = [ ...bingNewsWithImages, ...rssNews].map(newsItem => ({
+            ...newsItem,
+            timestamp: nowIso, // Add current timestamp
+            normalized_timestamp: nowIso
+        }));
+        
+        console.log('Total news articles fetched:', allNews.length );
+        console.log('Completed fetchNews with timestamp');
+        await saveNewsToDb(allNews);
+        console.log('Completed fetchNews');
+    } catch (error) {
+        console.error('fetchNews cycle failed:', error);
+    } finally {
+        isFetchRunning = false;
+    }
 }
 
 fetchNews();
