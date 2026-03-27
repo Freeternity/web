@@ -387,6 +387,24 @@ calculateTotalPages(itemsPerPage)
         console.error('Startup total-pages calculation failed:', err && err.message ? err.message : err);
     });
 
+let normalizedTimestampIndexReady = false;
+
+async function ensureNormalizedTimestampIndex() {
+    if (normalizedTimestampIndexReady) return;
+    try {
+        await newsDb.createIndex({
+            index: { fields: ['normalized_timestamp'] },
+            name: 'normalized-timestamp-index',
+            type: 'json'
+        });
+        normalizedTimestampIndexReady = true;
+        console.log('Index creation result for normalized_timestamp: ok');
+    } catch (error) {
+        // Continue; /news has a fallback path.
+        console.error('Error creating normalized_timestamp index:', error && error.message ? error.message : error);
+    }
+}
+
 // Modify the /news route
 app.get('/news', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
@@ -394,20 +412,38 @@ app.get('/news', async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     try {
-        // Fetch a larger set then sort by novelty timestamp in-app.
-        // (CouchDB has mixed legacy timestamp formats, so this is safest.)
-        const rawNews = await newsDb.find({
-            selector: { _id: { "$exists": true } },
-            limit: 5000
-        });
+        await ensureNormalizedTimestampIndex();
 
-        const sortedDocs = (rawNews.docs || []).sort((a, b) => {
-            const tb = parseNewsTimestamp(b);
-            const ta = parseNewsTimestamp(a);
-            if (tb !== ta) return tb - ta;
-            return String(b._id || '').localeCompare(String(a._id || ''));
-        });
-        const pagedDocs = sortedDocs.slice(skip, skip + limit);
+        let pagedDocs = [];
+        try {
+            // Primary path: have CouchDB return docs already ordered by normalized_timestamp desc.
+            const sortedResult = await newsDb.find({
+                selector: { normalized_timestamp: { "$exists": true } },
+                sort: [{ normalized_timestamp: 'desc' }],
+                skip,
+                limit,
+            });
+            pagedDocs = sortedResult.docs || [];
+        } catch (sortError) {
+            console.warn(
+                'Falling back to in-memory news sort:',
+                sortError && sortError.message ? sortError.message : sortError
+            );
+
+            // Fallback path if Mango sort/index is unavailable.
+            const rawNews = await newsDb.find({
+                selector: { _id: { "$exists": true } },
+                limit: 5000
+            });
+
+            const sortedDocs = (rawNews.docs || []).sort((a, b) => {
+                const tb = parseNewsTimestamp(b);
+                const ta = parseNewsTimestamp(a);
+                if (tb !== ta) return tb - ta;
+                return String(b._id || '').localeCompare(String(a._id || ''));
+            });
+            pagedDocs = sortedDocs.slice(skip, skip + limit);
+        }
 
         const totalItems = await newsDb.info().then(info => info.doc_count);
         const totalPages = Math.ceil(totalItems / limit);
